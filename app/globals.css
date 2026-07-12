@@ -3,6 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --page-bg: #f2f6f9;
 }
 
 @theme inline {
@@ -20,7 +21,29 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--page-bg);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family:
+    var(--font-geist-sans),
+    Segoe UI,
+    sans-serif;
+}
+
+.rx-paper {
+  aspect-ratio: 16 / 9;
+  max-width: 100%;
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+
+  .rx-paper {
+    aspect-ratio: auto;
+    width: 297mm;
+    min-height: 210mm;
+    box-shadow: none;
+    border: none;
+  }
 }
