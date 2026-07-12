@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Alert,
   Box,
@@ -24,6 +25,7 @@ import type {
 import PatientCodeDialog from "@/components/prescription/patient-code-dialog";
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
+import { formatRxItem, parseRxItems, stringifyRxItems } from "@/lib/rx";
 
 type SectionKey =
   | "complaintsSummary"
@@ -40,6 +42,15 @@ type SectionKey =
   | "glassPrediction"
   | "advice"
   | "followUp";
+
+const TAB_TO_SECTION: Record<string, { key: SectionKey; title: string }> = {
+  complaints: { key: "complaintsDetail", title: "Complaints Details" },
+  vision: { key: "visionDetail", title: "Vision Details" },
+  refraction: { key: "refractionDetail", title: "Refraction Details" },
+  history: { key: "historyDetail", title: "History Details" },
+  diagnosis: { key: "diagnosis", title: "Diagnosis" },
+  advice: { key: "advice", title: "Advice" },
+};
 
 const LEFT_SECTIONS: Array<{
   title: string;
@@ -92,6 +103,11 @@ export default function PrescriptionWorkspace({
   today: string;
   now: string;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
+
   const [patient, setPatient] = useState<PatientRecord | null>(null);
   const [lookupOpen, setLookupOpen] = useState(true);
   const [editor, setEditor] = useState<EditorState | null>(null);
@@ -105,8 +121,28 @@ export default function PrescriptionWorkspace({
     return `Patient loaded: ${patient.patientName} (${patient.patientCode})`;
   }, [patient]);
 
+  const rxItems = useMemo(() => parseRxItems(patient?.rx ?? ""), [patient?.rx]);
+
+  const tabMapping = tab ? TAB_TO_SECTION[tab] : undefined;
+  const activeEditor: EditorState | null =
+    editor ??
+    (tabMapping && patient
+      ? { key: tabMapping.key, title: tabMapping.title, open: true }
+      : null);
+
+  function clearTabParam() {
+    if (!tab) {
+      return;
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("tab");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  }
+
   function closeEditor() {
     setEditor(null);
+    clearTabParam();
   }
 
   async function saveField(key: keyof PatientRecord, value: string) {
@@ -353,16 +389,34 @@ export default function PrescriptionWorkspace({
                     size="small"
                     onClick={() => setRxEditorOpen(true)}
                   >
-                    {patient?.rx ? (
+                    {rxItems.length > 0 ? (
                       <EditIcon fontSize="small" />
                     ) : (
                       <AddIcon fontSize="small" />
                     )}
                   </IconButton>
                 </Box>
-                <Typography variant="body2" sx={{ mt: 1 }}>
-                  {patient?.rx || "No medicine selected yet."}
-                </Typography>
+                {rxItems.length > 0 ? (
+                  <Stack
+                    component="ul"
+                    spacing={0.5}
+                    sx={{ mt: 1, pl: 2.5, m: 0 }}
+                  >
+                    {rxItems.map((item) => (
+                      <Typography key={item.id} component="li" variant="body2">
+                        {formatRxItem(item)}
+                      </Typography>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mt: 1 }}
+                  >
+                    No medicine selected yet.
+                  </Typography>
+                )}
               </Paper>
 
               {[
@@ -436,15 +490,15 @@ export default function PrescriptionWorkspace({
         </Stack>
       </Paper>
 
-      {editor ? (
+      {activeEditor ? (
         <SectionEditorDialog
-          key={`${editor.key}-${patient?.patientCode ?? "none"}`}
-          open={editor.open}
-          title={editor.title}
-          value={String(patient?.[editor.key] ?? "")}
+          key={`${activeEditor.key}-${patient?.patientCode ?? "none"}`}
+          open={activeEditor.open}
+          title={activeEditor.title}
+          value={String(patient?.[activeEditor.key] ?? "")}
           onCancel={closeEditor}
           onSave={async (nextValue) => {
-            await saveField(editor.key, nextValue);
+            await saveField(activeEditor.key, nextValue);
             closeEditor();
           }}
         />
@@ -454,10 +508,10 @@ export default function PrescriptionWorkspace({
         key={`rx-${patient?.patientCode ?? "none"}-${patient?.rx ?? ""}`}
         open={rxEditorOpen}
         medicines={medicines}
-        value={patient?.rx ?? ""}
+        initialItems={rxItems}
         onCancel={() => setRxEditorOpen(false)}
-        onSave={async (nextValue) => {
-          await saveField("rx", nextValue);
+        onSave={async (nextItems) => {
+          await saveField("rx", stringifyRxItems(nextItems));
           setRxEditorOpen(false);
         }}
       />

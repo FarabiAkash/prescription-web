@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { getSession } from "@/lib/auth/session";
 import { getPortalBootstrapData } from "@/lib/repositories/dashboard";
 import PrescriptionWorkspace from "@/components/prescription/prescription-workspace";
@@ -13,12 +14,14 @@ export default async function PrescriptionPage() {
   }
 
   return (
-    <PrescriptionWorkspace
-      session={session}
-      medicines={bootstrap.medicines}
-      hospital={bootstrap.hospital}
-      today={bootstrap.today}
-      now={bootstrap.now}
-    />
+    <Suspense fallback={null}>
+      <PrescriptionWorkspace
+        session={session}
+        medicines={bootstrap.medicines}
+        hospital={bootstrap.hospital}
+        today={bootstrap.today}
+        now={bootstrap.now}
+      />
+    </Suspense>
   );
 }

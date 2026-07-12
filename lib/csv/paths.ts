@@ -7,4 +7,5 @@ export const DATA_FILES = {
   hospital: path.join(DATA_DIR, "hospital.csv"),
   medicine: path.join(DATA_DIR, "medicine.csv"),
   patients: path.join(DATA_DIR, "patients.csv"),
+  auditLog: path.join(DATA_DIR, "audit-log.csv"),
 } as const;

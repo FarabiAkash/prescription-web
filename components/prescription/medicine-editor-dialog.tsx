@@ -9,12 +9,19 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
   MenuItem,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
+import DeleteOutlineIcon from "@mui/icons-material/Delete";
 import type { MedicineRecord } from "@/types/portal";
+import { formatRxItem, type RxItem } from "@/lib/rx";
 
 const DEFAULT_DOSE = "1 drop";
 const DEFAULT_EYE = "Both";
@@ -29,26 +36,31 @@ type RxDraft = {
   duration: string;
 };
 
+function emptyDraft(): RxDraft {
+  return {
+    medicine: "",
+    dosage: DEFAULT_DOSE,
+    eye: DEFAULT_EYE,
+    frequency: DEFAULT_FREQUENCY,
+    duration: DEFAULT_DURATION,
+  };
+}
+
 export default function MedicineEditorDialog({
   open,
   medicines,
-  value,
+  initialItems,
   onCancel,
   onSave,
 }: {
   open: boolean;
   medicines: MedicineRecord[];
-  value: string;
+  initialItems: RxItem[];
   onCancel: () => void;
-  onSave: (nextValue: string) => void;
+  onSave: (nextItems: RxItem[]) => void;
 }) {
-  const [draft, setDraft] = useState<RxDraft>({
-    medicine: value,
-    dosage: DEFAULT_DOSE,
-    eye: DEFAULT_EYE,
-    frequency: DEFAULT_FREQUENCY,
-    duration: DEFAULT_DURATION,
-  });
+  const [items, setItems] = useState<RxItem[]>(initialItems);
+  const [draft, setDraft] = useState<RxDraft>(emptyDraft());
 
   const options = useMemo(
     () =>
@@ -69,9 +81,20 @@ export default function MedicineEditorDialog({
     }));
   }
 
-  function save() {
-    const payload = `${draft.medicine}; ${draft.dosage}; ${draft.eye} eye; ${draft.frequency}; ${draft.duration}`;
-    onSave(payload);
+  function addDraftToList() {
+    if (!draft.medicine) {
+      return;
+    }
+    const newItem: RxItem = {
+      id: `rx-${Date.now()}`,
+      ...draft,
+    };
+    setItems((prev) => [...prev, newItem]);
+    setDraft(emptyDraft());
+  }
+
+  function removeItem(id: string) {
+    setItems((prev) => prev.filter((item) => item.id !== id));
   }
 
   return (
@@ -81,11 +104,44 @@ export default function MedicineEditorDialog({
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Search a medicine, then set dosage, eye, frequency, and duration.
+            Add as many medicines as needed.
           </Typography>
+
+          {items.length > 0 ? (
+            <List dense disablePadding>
+              {items.map((item) => (
+                <ListItem
+                  key={item.id}
+                  secondaryAction={
+                    <IconButton
+                      edge="end"
+                      size="small"
+                      onClick={() => removeItem(item.id)}
+                    >
+                      <DeleteOutlineIcon fontSize="small" />
+                    </IconButton>
+                  }
+                  sx={{
+                    border: "1px solid #e3e9ee",
+                    borderRadius: 1.5,
+                    mb: 0.5,
+                  }}
+                >
+                  <ListItemText primary={formatRxItem(item)} />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No medicines added yet.
+            </Typography>
+          )}
+
+          <Divider />
 
           <Autocomplete
             options={options}
-            value={draft.medicine}
+            value={draft.medicine || null}
             onChange={(_, next) =>
               setDraft((prev) => ({ ...prev, medicine: next ?? "" }))
             }
@@ -134,18 +190,23 @@ export default function MedicineEditorDialog({
             />
           </Box>
 
-          <Button
-            onClick={resetDefaults}
-            variant="outlined"
-            sx={{ alignSelf: "start" }}
-          >
-            Reset to Default
-          </Button>
+          <Stack direction="row" spacing={1.5}>
+            <Button onClick={resetDefaults} variant="outlined">
+              Reset to Default
+            </Button>
+            <Button
+              onClick={addDraftToList}
+              variant="contained"
+              disabled={!draft.medicine}
+            >
+              Add Medicine
+            </Button>
+          </Stack>
         </Stack>
       </DialogContent>
       <DialogActions>
         <Button onClick={onCancel}>Cancel</Button>
-        <Button onClick={save} variant="contained" disabled={!draft.medicine}>
+        <Button onClick={() => onSave(items)} variant="contained">
           Save Rx
         </Button>
       </DialogActions>
