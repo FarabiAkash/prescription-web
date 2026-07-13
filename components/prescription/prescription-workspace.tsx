@@ -207,21 +207,21 @@ export default function PrescriptionWorkspace({
               gap: 0.5,
             }}
           >
-            <Typography variant="body2">
+            <Typography variant="body2" sx={{ fontWeight: 700 }}>
               Name: {patient?.patientName ?? "-"}
             </Typography>
             <Typography
               variant="body2"
-              sx={{ textAlign: { xs: "left", md: "right" } }}
+              sx={{ fontWeight: 700, textAlign: { xs: "left", md: "right" } }}
             >
               ID: {patient?.patientCode ?? "-"}
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" sx={{ fontWeight: 700 }}>
               Details: {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
             </Typography>
             <Typography
               variant="body2"
-              sx={{ textAlign: { xs: "left", md: "right" } }}
+              sx={{ fontWeight: 700, textAlign: { xs: "left", md: "right" } }}
             >
               Date: {today}
             </Typography>
@@ -405,7 +405,7 @@ export default function PrescriptionWorkspace({
               spacing={0.75}
               sx={{ height: "100%", "& > :last-child": { mt: "auto" } }}
             >
-              <Box sx={{ p: 0.75 }}>
+              <Box sx={{ p: 0.75, minHeight: "40%", flexShrink: 0 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -454,59 +454,69 @@ export default function PrescriptionWorkspace({
                 )}
               </Box>
 
-              {[
-                ["Glass Prediction", "glassPrediction"],
-                ["Advice", "advice"],
-                ["Follow Up", "followUp"],
-              ].map(([label, key]) => {
-                const content = String(
-                  patient?.[key as keyof PatientRecord] ?? "",
-                );
-                const hasContent = !isRichTextEmpty(content);
-                return (
-                  <Box key={label} sx={{ p: 0.75 }}>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 0.5,
-                      }}
-                    >
-                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                        {label}
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        color={hasContent ? "primary" : "success"}
-                        sx={{ p: 0.25 }}
-                        onClick={() =>
-                          setEditor({
-                            key: key as SectionKey,
-                            title: label,
-                            open: true,
-                          })
-                        }
-                      >
-                        {hasContent ? (
-                          <EditIcon sx={{ fontSize: 14 }} />
-                        ) : (
-                          <AddIcon sx={{ fontSize: 14 }} />
-                        )}
-                      </IconButton>
-                    </Box>
-                    {hasContent ? (
-                      <RichTextContent
-                        html={content}
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  flexGrow: 1,
+                  justifyContent: "space-evenly",
+                  gap: 0.75,
+                }}
+              >
+                {[
+                  ["Glass Prediction", "glassPrediction"],
+                  ["Advice", "advice"],
+                  ["Follow Up", "followUp"],
+                ].map(([label, key]) => {
+                  const content = String(
+                    patient?.[key as keyof PatientRecord] ?? "",
+                  );
+                  const hasContent = !isRichTextEmpty(content);
+                  return (
+                    <Box key={label} sx={{ p: 0.75 }}>
+                      <Box
                         sx={{
-                          mt: 0.25,
-                          fontSize: 11,
-                          color: "text.secondary",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 0.5,
                         }}
-                      />
-                    ) : null}
-                  </Box>
-                );
-              })}
+                      >
+                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                          {label}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          color={hasContent ? "primary" : "success"}
+                          sx={{ p: 0.25 }}
+                          onClick={() =>
+                            setEditor({
+                              key: key as SectionKey,
+                              title: label,
+                              open: true,
+                            })
+                          }
+                        >
+                          {hasContent ? (
+                            <EditIcon sx={{ fontSize: 14 }} />
+                          ) : (
+                            <AddIcon sx={{ fontSize: 14 }} />
+                          )}
+                        </IconButton>
+                      </Box>
+                      {hasContent ? (
+                        <RichTextContent
+                          html={content}
+                          sx={{
+                            mt: 0.25,
+                            fontSize: 11,
+                            color: "text.secondary",
+                          }}
+                        />
+                      ) : null}
+                    </Box>
+                  );
+                })}
+              </Box>
 
               <Box>
                 <Divider sx={{ mb: 1 }} />
