@@ -1,0 +1,112 @@
+Medicine Name,Generic Name,Dosage Form,Category
+Refresh Tears,Carboxymethylcellulose,Eye Drop,Artificial Tear
+Refresh Plus,Carboxymethylcellulose,Eye Drop,Artificial Tear
+Refresh Liquigel,Carboxymethylcellulose,Eye Drop,Artificial Tear
+Systane Ultra,Polyethylene Glycol + Propylene Glycol,Eye Drop,Artificial Tear
+Systane Complete,Propylene Glycol,Eye Drop,Artificial Tear
+Systane Gel,Polyethylene Glycol,Eye Gel,Lubricant
+Optive,Carboxymethylcellulose + Glycerin,Eye Drop,Artificial Tear
+Optive Fusion,Carboxymethylcellulose,Eye Drop,Artificial Tear
+Hylo-Comod,Sodium Hyaluronate,Eye Drop,Lubricant
+Hyabak,Sodium Hyaluronate,Eye Drop,Lubricant
+Thealoz,Trehalose,Eye Drop,Dry Eye
+Thealoz Duo,Trehalose + Sodium Hyaluronate,Eye Drop,Dry Eye
+Celluvisc,Carboxymethylcellulose,Eye Drop,Lubricant
+Lacri-Lube,White Petrolatum + Mineral Oil,Eye Ointment,Lubricant
+Vidisic,Carbomer,Eye Gel,Lubricant
+Tears Naturale,Dextran + Hypromellose,Eye Drop,Artificial Tear
+GenTeal,Hypromellose,Eye Drop,Lubricant
+Blink Tears,Polyethylene Glycol,Eye Drop,Lubricant
+Isopto Tears,Hypromellose,Eye Drop,Lubricant
+Refresh PM,White Petrolatum,Eye Ointment,Lubricant
+Timoptic,Timolol,Eye Drop,Glaucoma
+Betoptic,Betaxolol,Eye Drop,Glaucoma
+Alphagan P,Brimonidine,Eye Drop,Glaucoma
+Iopidine,Apraclonidine,Eye Drop,Glaucoma
+Trusopt,Dorzolamide,Eye Drop,Glaucoma
+Azopt,Brinzolamide,Eye Drop,Glaucoma
+Cosopt,Dorzolamide + Timolol,Eye Drop,Glaucoma
+Combigan,Brimonidine + Timolol,Eye Drop,Glaucoma
+Xalatan,Latanoprost,Eye Drop,Glaucoma
+Travatan Z,Travoprost,Eye Drop,Glaucoma
+Lumigan,Bimatoprost,Eye Drop,Glaucoma
+Zioptan,Tafluprost,Eye Drop,Glaucoma
+Pilocar,Pilocarpine,Eye Drop,Glaucoma
+Diamox,Acetazolamide,Tablet,Glaucoma
+Methazolamide,Methazolamide,Tablet,Glaucoma
+Ocuflox,Ofloxacin,Eye Drop,Antibiotic
+Vigamox,Moxifloxacin,Eye Drop,Antibiotic
+Moxeza,Moxifloxacin,Eye Drop,Antibiotic
+Zymar,Gatifloxacin,Eye Drop,Antibiotic
+Besivance,Besifloxacin,Eye Drop,Antibiotic
+Ciloxan,Ciprofloxacin,Eye Drop,Antibiotic
+Tobrex,Tobramycin,Eye Drop,Antibiotic
+Tobrex,Tobramycin,Eye Ointment,Antibiotic
+Gentak,Gentamicin,Eye Drop,Antibiotic
+Chloromycetin,Chloramphenicol,Eye Drop,Antibiotic
+Chloromycetin,Chloramphenicol,Eye Ointment,Antibiotic
+Polytrim,Polymyxin B + Trimethoprim,Eye Drop,Antibiotic
+Fucithalmic,Fusidic Acid,Eye Drop,Antibiotic
+Erythromycin,Erythromycin,Eye Ointment,Antibiotic
+Maxitrol,Neomycin + Polymyxin B + Dexamethasone,Eye Drop,Antibiotic + Steroid
+Tobradex,Tobramycin + Dexamethasone,Eye Drop,Antibiotic + Steroid
+Tobradex,Tobramycin + Dexamethasone,Eye Ointment,Antibiotic + Steroid
+Pred Forte,Prednisolone Acetate,Eye Drop,Steroid
+Pred Mild,Prednisolone Acetate,Eye Drop,Steroid
+Durezol,Difluprednate,Eye Drop,Steroid
+Lotemax,Loteprednol,Eye Drop,Steroid
+Lotemax Gel,Loteprednol,Eye Gel,Steroid
+FML,Fluorometholone,Eye Drop,Steroid
+Maxidex,Dexamethasone,Eye Drop,Steroid
+Dexafree,Dexamethasone,Eye Drop,Steroid
+Acular,Ketorolac,Eye Drop,NSAID
+Nevanac,Nepafenac,Eye Drop,NSAID
+Ilevro,Nepafenac,Eye Drop,NSAID
+Voltaren Ophtha,Diclofenac,Eye Drop,NSAID
+Prolensa,Bromfenac,Eye Drop,NSAID
+Atropine,Atropine Sulfate,Eye Drop,Mydriatic
+Cyclogyl,Cyclopentolate,Eye Drop,Cycloplegic
+Mydriacyl,Tropicamide,Eye Drop,Mydriatic
+Phenylephrine,Phenylephrine,Eye Drop,Mydriatic
+Cyclomydril,Cyclopentolate + Phenylephrine,Eye Drop,Mydriatic
+Proparacaine,Proparacaine,Eye Drop,Local Anesthetic
+Tetracaine,Tetracaine,Eye Drop,Local Anesthetic
+Benoxinate,Oxybuprocaine,Eye Drop,Local Anesthetic
+Patanol,Olopatadine,Eye Drop,Antihistamine
+Pataday,Olopatadine,Eye Drop,Antihistamine
+Zaditor,Ketotifen,Eye Drop,Antihistamine
+Alaway,Ketotifen,Eye Drop,Antihistamine
+Lastacaft,Alcaftadine,Eye Drop,Antihistamine
+Bepreve,Bepotastine,Eye Drop,Antihistamine
+Optivar,Azelastine,Eye Drop,Antihistamine
+Crolom,Cromolyn Sodium,Eye Drop,Mast Cell Stabilizer
+Alomide,Lodoxamide,Eye Drop,Mast Cell Stabilizer
+Restasis,Cyclosporine,Eye Drop,Dry Eye
+Cequa,Cyclosporine,Eye Drop,Dry Eye
+Ikervis,Cyclosporine,Eye Drop,Dry Eye
+Xiidra,Lifitegrast,Eye Drop,Dry Eye
+Zirgan,Ganciclovir,Eye Gel,Antiviral
+Viroptic,Trifluridine,Eye Drop,Antiviral
+Acyclovir,Acyclovir,Tablet,Antiviral
+Valacyclovir,Valacyclovir,Tablet,Antiviral
+Valganciclovir,Valganciclovir,Tablet,Antiviral
+Doxycycline,Doxycycline,Tablet,Blepharitis/Meibomian Gland Disease
+Azithromycin,Azithromycin,Tablet,Antibiotic
+Amoxicillin-Clavulanate,Amoxicillin + Clavulanate,Tablet,Antibiotic
+Prednisone,Prednisone,Tablet,Systemic Steroid
+Prednisolone,Prednisolone,Syrup,Systemic Steroid
+Acetazolamide,Acetazolamide,Injection,Glaucoma
+Mannitol,Mannitol,Injection,Osmotic Agent
+Bevacizumab,Bevacizumab,Intravitreal Injection,Anti-VEGF
+Ranibizumab,Ranibizumab,Intravitreal Injection,Anti-VEGF
+Aflibercept,Aflibercept,Intravitreal Injection,Anti-VEGF
+Faricimab,Faricimab,Intravitreal Injection,Anti-VEGF
+Triamcinolone Acetonide,Triamcinolone,Intravitreal Injection,Steroid
+Napa,Paracetamol,Tablet,Analgesic
+Napa Extra,Paracetamol + Caffeine,Tablet,Analgesic
+Ace,Paracetamol,Tablet,Analgesic
+Fexo,Fexofenadine,Tablet,Antihistamine
+Seclo,Omeprazole,Tablet,Antacid
+Losectil,Omeprazole,Tablet,Antacid
+Monas,Montelukast,Tablet,Antihistamine
+Alatrol,Cetirizine,Tablet,Antihistamine

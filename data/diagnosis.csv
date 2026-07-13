@@ -1,0 +1,49 @@
+Diagnosis Name,Category
+Dry Eye Syndrome,Cornea
+Corneal Ulcer,Cornea
+Keratoconus,Cornea
+Corneal Abrasion,Cornea
+Bacterial Keratitis,Cornea
+Fungal Keratitis,Cornea
+Pterygium,Cornea
+Cataract (Immature),Cataract
+Cataract (Mature),Cataract
+Cataract (Hypermature),Cataract
+Posterior Capsule Opacification,Cataract
+Primary Open Angle Glaucoma,Glaucoma
+Primary Angle Closure Glaucoma,Glaucoma
+Normal Tension Glaucoma,Glaucoma
+Ocular Hypertension,Glaucoma
+Secondary Glaucoma,Glaucoma
+Diabetic Retinopathy (NPDR),Retina
+Diabetic Retinopathy (PDR),Retina
+Diabetic Macular Edema,Retina
+Age-Related Macular Degeneration (Dry),Retina
+Age-Related Macular Degeneration (Wet),Retina
+Retinal Detachment,Retina
+Central Retinal Vein Occlusion,Retina
+Branch Retinal Vein Occlusion,Retina
+Central Serous Retinopathy,Retina
+Allergic Conjunctivitis,Conjunctiva
+Bacterial Conjunctivitis,Conjunctiva
+Viral Conjunctivitis,Conjunctiva
+Subconjunctival Hemorrhage,Conjunctiva
+Anterior Uveitis,Uveitis
+Posterior Uveitis,Uveitis
+Panuveitis,Uveitis
+Refractive Error (Myopia),Refractive
+Refractive Error (Hyperopia),Refractive
+Astigmatism,Refractive
+Presbyopia,Refractive
+Amblyopia,Pediatric
+Strabismus,Pediatric
+Blepharitis,Oculoplasty
+Chalazion,Oculoplasty
+Hordeolum (Stye),Oculoplasty
+Ptosis,Oculoplasty
+Ectropion,Oculoplasty
+Entropion,Oculoplasty
+Dacryocystitis,Oculoplasty
+Optic Neuritis,Neuro-Ophthalmology
+Papilledema,Neuro-Ophthalmology
+Thyroid Eye Disease,Neuro-Ophthalmology

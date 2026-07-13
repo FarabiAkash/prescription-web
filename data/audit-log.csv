@@ -1,0 +1,23 @@
+Timestamp,Doctor Username,Patient Code,Field,Value Snippet
+2026-07-13T13:54:18.868Z,sarwar,P-1001,complaintsSummary,"Defective vision (2 weeks), redness, pain (3 days)<br>Defective vision (2 weeks), redness, pain (3 days)<br>Defective vi..."
+2026-07-13T13:57:28.171Z,sarwar,P-1001,complaintsSummary,"Defective vision (2 weeks), redness, pain (3 days)<div>Defective vision (2 weeks), redness, pain (3 days)</div>"
+2026-07-13T14:00:44.261Z,sarwar,P-1001,complaintsSummary,"<ul><li>Defective vision (2 weeks), redness, pain (3 days)</li><li>Defective vision (2 weeks), redness, pain (3 days)</l..."
+2026-07-13T14:05:16.799Z,sarwar,P-1001,visionSummary,"<ul><li>UCVA: R 2/60, L 6/6</li></ul>"
+2026-07-13T14:06:02.244Z,sarwar,P-1001,refractionSummary,"<ul><li>R: -1.00 DS, L: Plano</li></ul>"
+2026-07-13T14:06:04.875Z,sarwar,P-1001,historySummary,<ul><li>NTN (5 years)</li></ul>
+2026-07-13T14:06:08.599Z,sarwar,P-1001,diagnosis,<ul><li>Dry Eye Syndrome</li></ul>
+2026-07-13T14:06:12.206Z,sarwar,P-1001,investigation,<ul><li>Tear breakup time and Schirmer test</li></ul>
+2026-07-13T14:06:15.424Z,sarwar,P-1001,plan,<ul><li>Lubrication + follow-up</li></ul>
+2026-07-13T14:07:29.883Z,sarwar,P-1001,historySummary,<ul><li>NTN (5 years)</li></ul>
+2026-07-13T14:13:42.766Z,sarwar,P-1001,plan,<ul><li><br></li></ul>
+2026-07-13T14:13:48.894Z,sarwar,P-1001,plan,<ul><li><br></li></ul>
+2026-07-13T14:13:54.886Z,sarwar,P-1001,investigation,<ul><li><br></li></ul>
+2026-07-13T14:14:03.181Z,sarwar,P-1001,refractionSummary,<ul><li><br></li></ul>
+2026-07-13T14:48:01.970Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""3..."
+2026-07-13T15:22:20.014Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Right"",""frequency"":""..."
+2026-07-13T15:22:47.308Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Right"",""frequency"":""..."
+2026-07-13T15:24:18.257Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Right"",""frequency"":""..."
+2026-07-13T15:30:49.008Z,sarwar,P-1001,rx,"[{""id"":""rx-1783956164945-1"",""medicine"":""Timoptic (Eye Drop) - Glaucoma"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""2 ti..."
+2026-07-13T15:32:17.227Z,sarwar,P-1001,rx,"[{""id"":""rx-1783956164945-1"",""medicine"":""Timoptic (Eye Drop) - Glaucoma"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""2 ti..."
+2026-07-13T16:33:10.669Z,sarwar,P-1001,diagnosis,"[{""id"":""dx-legacy-0"",""name"":""Dry Eye Syndrome"",""eye"":""""},{""id"":""dx-1783960218127-1"",""name"":""Corneal Ulcer"",""eye"":""Left""}..."
+2026-07-13T16:35:14.872Z,sarwar,P-1001,diagnosis,"[{""id"":""dx-legacy-0"",""name"":""Dry Eye Syndrome"",""eye"":""Right""},{""id"":""dx-1783960218127-1"",""name"":""Corneal Ulcer"",""eye"":""L..."

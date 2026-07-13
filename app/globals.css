@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --page-bg: #f2f6f9;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--page-bg);
+  color: var(--foreground);
+  font-family:
+    var(--font-geist-sans),
+    Segoe UI,
+    sans-serif;
+}
+
+.rx-paper {
+  width: min(100%, calc((100dvh - 112px) * 16 / 9));
+  aspect-ratio: 16 / 9;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: auto;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.08),
+    0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+@media print {
+  @page {
+    /* Matches the on-screen 16:9 prescription paper so the exact same
+       layout (which already fits that shape) fits print with no reflow. */
+    size: 297mm 167mm;
+    margin: 0;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    background: #ffffff;
+  }
+
+  .rx-paper {
+    max-width: none;
+    aspect-ratio: auto;
+    width: 297mm;
+    height: 167mm;
+    margin: 0;
+    overflow: hidden;
+    box-shadow: none;
+    border: none;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
