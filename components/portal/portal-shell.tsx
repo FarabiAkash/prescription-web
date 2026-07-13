@@ -19,7 +19,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { PropsWithChildren } from "react";
 import type { SessionUser, SidebarModule } from "@/types/portal";
 import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
-import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
+import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded";
 import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
 import CenterFocusStrongRoundedIcon from "@mui/icons-material/CenterFocusStrongRounded";
@@ -40,12 +40,6 @@ type ModuleItem = {
 
 const MODULES: ModuleItem[] = [
   { label: "Patients", path: "/portal/patients", icon: PeopleAltRoundedIcon },
-  {
-    label: "Prescription",
-    path: "/portal/prescription",
-    icon: DescriptionRoundedIcon,
-    requiresPatient: true,
-  },
   {
     label: "Complaints",
     path: "/portal/prescription?tab=complaints",
@@ -223,6 +217,38 @@ export default function PortalShell({
             Modules
           </Typography>
         </Toolbar>
+
+        {hasPatient ? (
+          <Box sx={{ px: 1.5, pt: 1 }}>
+            <ListItemButton
+              onClick={() => router.push("/portal/patients")}
+              sx={{
+                borderRadius: 1,
+                border: "1px solid",
+                borderColor: "secondary.main",
+                color: "secondary.main",
+                transition: "background-color 0.15s ease, color 0.15s ease",
+                "&:hover": {
+                  backgroundColor: "secondary.main",
+                  color: "secondary.contrastText",
+                },
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 36, color: "inherit" }}>
+                <ArrowBackRoundedIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText
+                primary={
+                  <Typography sx={{ fontWeight: 700, fontSize: 14 }}>
+                    Save &amp; Exit to Patients
+                  </Typography>
+                }
+              />
+            </ListItemButton>
+            <Divider sx={{ my: 1 }} />
+          </Box>
+        ) : null}
+
         <List sx={{ px: 1.5, py: 1 }}>
           {visibleModules.map((item) => {
             const Icon = item.icon;
