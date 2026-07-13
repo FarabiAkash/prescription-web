@@ -4,10 +4,19 @@ export const portalTheme = createTheme({
   palette: {
     mode: "light",
     primary: {
-      main: "#0f6a9a",
+      main: "#04669c",
     },
     secondary: {
       main: "#f08c00",
+    },
+    info: {
+      main: "#4fb3e8",
+    },
+    warning: {
+      main: "#f4c20d",
+    },
+    success: {
+      main: "#2e9e5b",
     },
     background: {
       default: "#f2f6f9",

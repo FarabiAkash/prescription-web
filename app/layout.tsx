@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eye Hospital Doctor Portal",
+  title: "Ispahani Doctor Portal",
   description: "Demo POC for prescription workflow",
 };
 
