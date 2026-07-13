@@ -54,6 +54,20 @@ export type MedicineRecord = {
   category: string;
 };
 
+export type MedicineSetItem = {
+  medicine: string;
+  dosage: string;
+  eye: string;
+  frequency: string;
+  duration: string;
+};
+
+export type MedicineSetRecord = {
+  name: string;
+  category: string;
+  items: MedicineSetItem[];
+};
+
 export type SessionUser = {
   username: string;
   doctorName: string;

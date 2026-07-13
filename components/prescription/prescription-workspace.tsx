@@ -17,6 +17,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import Image from "next/image";
 import type {
   MedicineRecord,
+  MedicineSetRecord,
   PatientRecord,
   SessionUser,
 } from "@/types/portal";
@@ -87,6 +88,7 @@ type EditorState = {
 export default function PrescriptionWorkspace({
   session,
   medicines,
+  sets,
   hospital,
   today,
   now,
@@ -94,6 +96,7 @@ export default function PrescriptionWorkspace({
 }: {
   session: SessionUser;
   medicines: MedicineRecord[];
+  sets: MedicineSetRecord[];
   hospital: {
     hospitalName: string;
     address: string;
@@ -590,6 +593,7 @@ export default function PrescriptionWorkspace({
         key={`rx-${patient?.patientCode ?? "none"}-${patient?.rx ?? ""}`}
         open={rxEditorOpen}
         medicines={medicines}
+        sets={sets}
         initialItems={rxItems}
         onCancel={() => setRxEditorOpen(false)}
         onSave={async (nextItems) => {

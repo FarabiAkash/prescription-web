@@ -14,3 +14,8 @@ Timestamp,Doctor Username,Patient Code,Field,Value Snippet
 2026-07-13T14:13:54.886Z,sarwar,P-1001,investigation,<ul><li><br></li></ul>
 2026-07-13T14:14:03.181Z,sarwar,P-1001,refractionSummary,<ul><li><br></li></ul>
 2026-07-13T14:48:01.970Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""3..."
+2026-07-13T15:22:20.014Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Right"",""frequency"":""..."
+2026-07-13T15:22:47.308Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Right"",""frequency"":""..."
+2026-07-13T15:24:18.257Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Right"",""frequency"":""..."
+2026-07-13T15:30:49.008Z,sarwar,P-1001,rx,"[{""id"":""rx-1783956164945-1"",""medicine"":""Timoptic (Eye Drop) - Glaucoma"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""2 ti..."
+2026-07-13T15:32:17.227Z,sarwar,P-1001,rx,"[{""id"":""rx-1783956164945-1"",""medicine"":""Timoptic (Eye Drop) - Glaucoma"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""2 ti..."
