@@ -31,7 +31,25 @@ export function parseRxItems(raw: string): RxItem[] {
     // Fall through to legacy text handling below.
   }
 
-  // Legacy format: a single free-text Rx line saved before structured items existed.
+  // Legacy format: a single free-text Rx line saved before structured items
+  // existed, e.g. "Medicine; 1 drop; Both eye; 3 times daily; 14 days"
+  // (the exact shape produced by the old formatRxItem()). Try to split it
+  // back into fields; otherwise treat the whole line as the medicine name.
+  const segments = trimmed.split(";").map((segment) => segment.trim());
+  if (segments.length === 5 && /\s+eye$/i.test(segments[2])) {
+    const [medicine, dosage, eyeSegment, frequency, duration] = segments;
+    return [
+      {
+        id: "rx-legacy",
+        medicine,
+        dosage,
+        eye: eyeSegment.replace(/\s+eye$/i, ""),
+        frequency,
+        duration,
+      },
+    ];
+  }
+
   return [
     {
       id: "rx-legacy",

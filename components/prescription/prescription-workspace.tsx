@@ -24,7 +24,7 @@ import SectionEditorDialog from "@/components/prescription/section-editor-dialog
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
 import RichTextContent from "@/components/prescription/rich-text-content";
 import { isRichTextEmpty } from "@/lib/sanitize-html";
-import { formatRxItem, parseRxItems, stringifyRxItems } from "@/lib/rx";
+import { parseRxItems, stringifyRxItems } from "@/lib/rx";
 
 type SectionKey =
   | "complaintsSummary"
@@ -429,19 +429,44 @@ export default function PrescriptionWorkspace({
                 </Box>
                 {rxItems.length > 0 ? (
                   <Stack
-                    component="ul"
-                    spacing={0.25}
-                    sx={{ mt: 0.5, pl: 2, m: 0 }}
+                    component="ol"
+                    spacing={0.5}
+                    sx={{
+                      mt: 0.5,
+                      pl: 2,
+                      m: 0,
+                      listStyleType: "decimal",
+                      "& li": { listStylePosition: "outside" },
+                    }}
                   >
-                    {rxItems.map((item) => (
-                      <Typography
-                        key={item.id}
-                        component="li"
-                        variant="caption"
-                      >
-                        {formatRxItem(item)}
-                      </Typography>
-                    ))}
+                    {rxItems.map((item) => {
+                      const usageParts = [
+                        [item.dosage, item.frequency]
+                          .filter(Boolean)
+                          .join(" X "),
+                        item.eye ? `${item.eye} eye` : "",
+                        item.duration,
+                      ].filter(Boolean);
+                      return (
+                        <Box key={item.id} component="li">
+                          <Typography
+                            variant="body2"
+                            sx={{ fontWeight: 700, display: "block" }}
+                          >
+                            {item.medicine}
+                          </Typography>
+                          {usageParts.length > 0 ? (
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ display: "block" }}
+                            >
+                              {usageParts.join(" --------------- ")}
+                            </Typography>
+                          ) : null}
+                        </Box>
+                      );
+                    })}
                   </Stack>
                 ) : (
                   <Typography
