@@ -3,10 +3,7 @@
 import { useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
-  Alert,
   Box,
-  Button,
-  Chip,
   Divider,
   IconButton,
   Paper,
@@ -18,7 +15,6 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Image from "next/image";
-import Link from "next/link";
 import type {
   MedicineRecord,
   PatientRecord,
@@ -115,14 +111,6 @@ export default function PrescriptionWorkspace({
   const [patient, setPatient] = useState<PatientRecord | null>(initialPatient);
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [rxEditorOpen, setRxEditorOpen] = useState(false);
-  const [saving, setSaving] = useState(false);
-
-  const infoText = useMemo(() => {
-    if (!patient) {
-      return "Load a patient to start prescription entry.";
-    }
-    return `Patient loaded: ${patient.patientName} (${patient.patientCode})`;
-  }, [patient]);
 
   const rxItems = useMemo(() => parseRxItems(patient?.rx ?? ""), [patient?.rx]);
 
@@ -152,7 +140,6 @@ export default function PrescriptionWorkspace({
     if (!patient) {
       return;
     }
-    setSaving(true);
 
     const response = await fetch("/api/prescription/save", {
       method: "POST",
@@ -171,74 +158,75 @@ export default function PrescriptionWorkspace({
     if (response.ok && payload.patient) {
       setPatient(payload.patient);
     }
-
-    setSaving(false);
   }
 
   return (
-    <Stack spacing={2.5}>
-      <Alert
-        severity="info"
-        action={
-          <Button
-            component={Link}
-            href="/portal/patients"
-            color="inherit"
-            size="small"
-          >
-            Change Patient
-          </Button>
-        }
-      >
-        {infoText}
-      </Alert>
-
-      <Paper sx={{ p: 2.5, border: "1px solid #d8e2eb" }}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Typography variant="h5">Prescription</Typography>
-          <Chip
-            color={saving ? "secondary" : "primary"}
-            label={saving ? "Saving..." : "Auto-save ready"}
-          />
-        </Box>
-      </Paper>
-
+    <Stack spacing={1.5}>
       <Paper
         className="rx-paper"
-        sx={{ p: { xs: 2, md: 3 }, border: "1px solid #d8e2eb" }}
+        sx={{
+          p: { xs: 1.25, md: 1.75 },
+          px: { xs: 2, sm: 3, md: 4 },
+          border: "1px solid #d8e2eb",
+        }}
       >
-        <Stack spacing={2}>
+        <Stack spacing={1} sx={{ height: "100%" }}>
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
+              flexDirection: "column",
               alignItems: "center",
+              textAlign: "center",
+              gap: 0.25,
             }}
           >
-            <Box sx={{ display: "flex", gap: 1.5, alignItems: "center" }}>
+            <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
               <Image
                 src="/images/logo.jpg"
                 alt="Hospital Logo"
-                width={72}
-                height={72}
+                width={40}
+                height={40}
               />
-              <Box>
-                <Typography variant="h6">{hospital.hospitalName}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {hospital.address}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {hospital.contact} | {hospital.website}
-                </Typography>
-              </Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                {hospital.hospitalName}
+              </Typography>
             </Box>
-            <Typography variant="h6">Prescription Sheet</Typography>
+            <Typography variant="caption" color="text.secondary">
+              {hospital.address}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {hospital.contact} | {hospital.website}
+            </Typography>
+            <Typography variant="h6" sx={{ mt: 0.25, fontWeight: 700 }}>
+              Prescription Sheet
+            </Typography>
+          </Box>
+
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
+              gap: 0.5,
+            }}
+          >
+            <Typography variant="body2">
+              Name: {patient?.patientName ?? "-"}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ textAlign: { xs: "left", md: "right" } }}
+            >
+              ID: {patient?.patientCode ?? "-"}
+            </Typography>
+            <Typography variant="body2">
+              Details: {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ textAlign: { xs: "left", md: "right" } }}
+            >
+              Date: {today}
+            </Typography>
           </Box>
 
           <Divider />
@@ -246,35 +234,18 @@ export default function PrescriptionWorkspace({
           <Box
             sx={{
               display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: 1.5,
+              gridTemplateColumns: { xs: "1fr", lg: "3fr auto 7fr" },
+              gap: 1.25,
+              flexGrow: 1,
+              alignItems: "stretch",
             }}
           >
-            <Typography>Name: {patient?.patientName ?? "-"}</Typography>
-            <Typography sx={{ textAlign: { xs: "left", md: "right" } }}>
-              ID: {patient?.patientCode ?? "-"}
-            </Typography>
-            <Typography>
-              Details: {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
-            </Typography>
-            <Typography sx={{ textAlign: { xs: "left", md: "right" } }}>
-              Date: {today}
-            </Typography>
-          </Box>
-
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", lg: "340px minmax(0, 1fr)" },
-              gap: 2.5,
-            }}
-          >
-            <Stack spacing={1.5}>
+            <Stack spacing={0.75} sx={{ height: "100%" }}>
               {LEFT_SECTIONS.map((section) => {
                 const summary = String(patient?.[section.summaryKey] ?? "");
                 const detail = String(patient?.[section.detailKey] ?? "");
                 return (
-                  <Paper key={section.title} variant="outlined" sx={{ p: 1.2 }}>
+                  <Box key={section.title} sx={{ p: 0.75 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -282,15 +253,16 @@ export default function PrescriptionWorkspace({
                         justifyContent: "space-between",
                       }}
                     >
-                      <Typography variant="subtitle2">
+                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
                         {section.title}
                       </Typography>
-                      <Box sx={{ display: "flex", gap: 0.5 }}>
+                      <Box sx={{ display: "flex", gap: 0.25 }}>
                         <Tooltip
                           title={summary ? "Edit summary" : "Add summary"}
                         >
                           <IconButton
                             size="small"
+                            sx={{ p: 0.25 }}
                             onClick={() =>
                               setEditor({
                                 key: section.summaryKey as SectionKey,
@@ -300,15 +272,16 @@ export default function PrescriptionWorkspace({
                             }
                           >
                             {summary ? (
-                              <EditIcon fontSize="small" />
+                              <EditIcon sx={{ fontSize: 14 }} />
                             ) : (
-                              <AddIcon fontSize="small" />
+                              <AddIcon sx={{ fontSize: 14 }} />
                             )}
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="View/Edit details">
                           <IconButton
                             size="small"
+                            sx={{ p: 0.25 }}
                             onClick={() =>
                               setEditor({
                                 key: section.detailKey as SectionKey,
@@ -317,7 +290,7 @@ export default function PrescriptionWorkspace({
                               })
                             }
                           >
-                            <VisibilityIcon fontSize="small" />
+                            <VisibilityIcon sx={{ fontSize: 14 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -325,18 +298,18 @@ export default function PrescriptionWorkspace({
                     <RichTextContent
                       html={summary || "No summary yet."}
                       sx={{
-                        mt: 0.8,
-                        fontSize: 14,
+                        mt: 0.25,
+                        fontSize: 11,
                         color: "text.secondary",
                       }}
                     />
                     {detail ? (
                       <RichTextContent
                         html={detail}
-                        sx={{ fontSize: 12, color: "text.secondary" }}
+                        sx={{ fontSize: 10, color: "text.secondary" }}
                       />
                     ) : null}
-                  </Paper>
+                  </Box>
                 );
               })}
 
@@ -349,7 +322,7 @@ export default function PrescriptionWorkspace({
                   patient?.[key as keyof PatientRecord] ?? "",
                 );
                 return (
-                  <Paper key={label} variant="outlined" sx={{ p: 1.2 }}>
+                  <Box key={label} sx={{ p: 0.75 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -357,9 +330,12 @@ export default function PrescriptionWorkspace({
                         justifyContent: "space-between",
                       }}
                     >
-                      <Typography variant="subtitle2">{label}</Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        {label}
+                      </Typography>
                       <IconButton
                         size="small"
+                        sx={{ p: 0.25 }}
                         onClick={() =>
                           setEditor({
                             key: key as SectionKey,
@@ -369,27 +345,36 @@ export default function PrescriptionWorkspace({
                         }
                       >
                         {content ? (
-                          <EditIcon fontSize="small" />
+                          <EditIcon sx={{ fontSize: 14 }} />
                         ) : (
-                          <AddIcon fontSize="small" />
+                          <AddIcon sx={{ fontSize: 14 }} />
                         )}
                       </IconButton>
                     </Box>
                     <RichTextContent
                       html={content || "No entry yet."}
                       sx={{
-                        mt: 0.6,
-                        fontSize: 14,
+                        mt: 0.25,
+                        fontSize: 11,
                         color: "text.secondary",
                       }}
                     />
-                  </Paper>
+                  </Box>
                 );
               })}
             </Stack>
 
-            <Stack spacing={1.5}>
-              <Paper variant="outlined" sx={{ p: 1.4 }}>
+            <Divider
+              orientation="vertical"
+              flexItem
+              sx={{ display: { xs: "none", lg: "block" } }}
+            />
+
+            <Stack
+              spacing={0.75}
+              sx={{ height: "100%", "& > :last-child": { mt: "auto" } }}
+            >
+              <Box sx={{ p: 0.75 }}>
                 <Box
                   sx={{
                     display: "flex",
@@ -397,40 +382,45 @@ export default function PrescriptionWorkspace({
                     justifyContent: "space-between",
                   }}
                 >
-                  <Typography variant="h6">Rx.</Typography>
+                  <Typography variant="subtitle2">Rx.</Typography>
                   <IconButton
                     size="small"
+                    sx={{ p: 0.25 }}
                     onClick={() => setRxEditorOpen(true)}
                   >
                     {rxItems.length > 0 ? (
-                      <EditIcon fontSize="small" />
+                      <EditIcon sx={{ fontSize: 14 }} />
                     ) : (
-                      <AddIcon fontSize="small" />
+                      <AddIcon sx={{ fontSize: 14 }} />
                     )}
                   </IconButton>
                 </Box>
                 {rxItems.length > 0 ? (
                   <Stack
                     component="ul"
-                    spacing={0.5}
-                    sx={{ mt: 1, pl: 2.5, m: 0 }}
+                    spacing={0.25}
+                    sx={{ mt: 0.5, pl: 2, m: 0 }}
                   >
                     {rxItems.map((item) => (
-                      <Typography key={item.id} component="li" variant="body2">
+                      <Typography
+                        key={item.id}
+                        component="li"
+                        variant="caption"
+                      >
                         {formatRxItem(item)}
                       </Typography>
                     ))}
                   </Stack>
                 ) : (
                   <Typography
-                    variant="body2"
+                    variant="caption"
                     color="text.secondary"
-                    sx={{ mt: 1 }}
+                    sx={{ mt: 0.5, display: "block" }}
                   >
                     No medicine selected yet.
                   </Typography>
                 )}
-              </Paper>
+              </Box>
 
               {[
                 ["Glass Prediction", "glassPrediction"],
@@ -441,7 +431,7 @@ export default function PrescriptionWorkspace({
                   patient?.[key as keyof PatientRecord] ?? "",
                 );
                 return (
-                  <Paper key={label} variant="outlined" sx={{ p: 1.4 }}>
+                  <Box key={label} sx={{ p: 0.75 }}>
                     <Box
                       sx={{
                         display: "flex",
@@ -449,9 +439,12 @@ export default function PrescriptionWorkspace({
                         justifyContent: "space-between",
                       }}
                     >
-                      <Typography variant="subtitle1">{label}</Typography>
+                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        {label}
+                      </Typography>
                       <IconButton
                         size="small"
+                        sx={{ p: 0.25 }}
                         onClick={() =>
                           setEditor({
                             key: key as SectionKey,
@@ -461,45 +454,49 @@ export default function PrescriptionWorkspace({
                         }
                       >
                         {content ? (
-                          <EditIcon fontSize="small" />
+                          <EditIcon sx={{ fontSize: 14 }} />
                         ) : (
-                          <AddIcon fontSize="small" />
+                          <AddIcon sx={{ fontSize: 14 }} />
                         )}
                       </IconButton>
                     </Box>
                     <RichTextContent
                       html={content || "No entry yet."}
                       sx={{
-                        mt: 0.8,
-                        fontSize: 14,
+                        mt: 0.25,
+                        fontSize: 11,
                         color: "text.secondary",
                       }}
                     />
-                  </Paper>
+                  </Box>
                 );
               })}
+
+              <Box>
+                <Divider sx={{ mb: 1 }} />
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    textAlign: "center",
+                    gap: 0.1,
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                    {session.doctorName}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    {session.designation} | Reg: {session.registrationNumber} |{" "}
+                    {session.specialization}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    Generated: {today} {now}
+                  </Typography>
+                </Box>
+              </Box>
             </Stack>
-          </Box>
-
-          <Divider />
-
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Box>
-              <Typography variant="subtitle2">{session.doctorName}</Typography>
-              <Typography variant="caption" color="text.secondary">
-                {session.designation} | Reg: {session.registrationNumber} |{" "}
-                {session.specialization}
-              </Typography>
-            </Box>
-            <Typography variant="caption" color="text.secondary">
-              Generated: {today} {now}
-            </Typography>
           </Box>
         </Stack>
       </Paper>

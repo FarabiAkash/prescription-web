@@ -30,8 +30,14 @@ body {
 }
 
 .rx-paper {
+  width: min(100%, calc((100dvh - 112px) * 16 / 9));
   aspect-ratio: 16 / 9;
-  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  overflow: auto;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.08),
+    0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
 @media print {
@@ -40,6 +46,7 @@ body {
   }
 
   .rx-paper {
+    max-width: none;
     aspect-ratio: auto;
     width: 297mm;
     min-height: 210mm;

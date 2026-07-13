@@ -169,7 +169,7 @@ export default function PortalShell({
             }}
           >
             <Box>
-              <Typography variant="h6">Eye Hospital Doctors Portal</Typography>
+              <Typography variant="h6">Ispahani Doctors Portal</Typography>
               <Typography variant="caption" color="text.secondary">
                 Signed in as {session.doctorName}
               </Typography>
