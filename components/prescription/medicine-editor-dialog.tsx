@@ -11,17 +11,21 @@ import {
   DialogTitle,
   Divider,
   IconButton,
-  List,
-  ListItem,
-  ListItemText,
   MenuItem,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/Delete";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import type { MedicineRecord } from "@/types/portal";
-import { formatRxItem, type RxItem } from "@/lib/rx";
+import type { RxItem } from "@/lib/rx";
 
 const DEFAULT_DOSE = "1 drop";
 const DEFAULT_EYE = "Both";
@@ -97,70 +101,48 @@ export default function MedicineEditorDialog({
     setItems((prev) => prev.filter((item) => item.id !== id));
   }
 
+  function updateItem(id: string, field: keyof RxItem, value: string) {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+    );
+  }
+
   return (
-    <Dialog open={open} fullWidth maxWidth="md" onClose={onCancel}>
+    <Dialog open={open} fullWidth maxWidth="lg" onClose={onCancel}>
       <DialogTitle>Rx Medicine Picker</DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Search a medicine, then set dosage, eye, frequency, and duration.
-            Add as many medicines as needed.
+            Search a medicine, set dosage, eye, frequency, and duration, then
+            add it below. Every field stays editable in the table.
           </Typography>
-
-          {items.length > 0 ? (
-            <List dense disablePadding>
-              {items.map((item) => (
-                <ListItem
-                  key={item.id}
-                  secondaryAction={
-                    <IconButton
-                      edge="end"
-                      size="small"
-                      onClick={() => removeItem(item.id)}
-                    >
-                      <DeleteOutlineIcon fontSize="small" />
-                    </IconButton>
-                  }
-                  sx={{
-                    border: "1px solid #e3e9ee",
-                    borderRadius: 1.5,
-                    mb: 0.5,
-                  }}
-                >
-                  <ListItemText primary={formatRxItem(item)} />
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography variant="body2" color="text.secondary">
-              No medicines added yet.
-            </Typography>
-          )}
-
-          <Divider />
-
-          <Autocomplete
-            options={options}
-            value={draft.medicine || null}
-            onChange={(_, next) =>
-              setDraft((prev) => ({ ...prev, medicine: next ?? "" }))
-            }
-            renderInput={(params) => <TextField {...params} label="Medicine" />}
-          />
 
           <Box
             sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
-              gap: 2,
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "flex-start",
+              gap: 1.5,
             }}
           >
+            <Autocomplete
+              options={options}
+              value={draft.medicine || null}
+              onChange={(_, next) =>
+                setDraft((prev) => ({ ...prev, medicine: next ?? "" }))
+              }
+              sx={{ flex: "2 1 260px" }}
+              renderInput={(params) => (
+                <TextField {...params} label="Medicine" />
+              )}
+            />
             <TextField
               label="Dosage"
               value={draft.dosage}
               onChange={(event) =>
                 setDraft((prev) => ({ ...prev, dosage: event.target.value }))
               }
+              sx={{ flex: "1 1 130px" }}
             />
             <TextField
               select
@@ -169,6 +151,7 @@ export default function MedicineEditorDialog({
               onChange={(event) =>
                 setDraft((prev) => ({ ...prev, eye: event.target.value }))
               }
+              sx={{ flex: "1 1 120px" }}
             >
               <MenuItem value="Right">Right</MenuItem>
               <MenuItem value="Left">Left</MenuItem>
@@ -178,8 +161,12 @@ export default function MedicineEditorDialog({
               label="Frequency"
               value={draft.frequency}
               onChange={(event) =>
-                setDraft((prev) => ({ ...prev, frequency: event.target.value }))
+                setDraft((prev) => ({
+                  ...prev,
+                  frequency: event.target.value,
+                }))
               }
+              sx={{ flex: "1 1 150px" }}
             />
             <TextField
               label="Duration"
@@ -187,21 +174,109 @@ export default function MedicineEditorDialog({
               onChange={(event) =>
                 setDraft((prev) => ({ ...prev, duration: event.target.value }))
               }
+              sx={{ flex: "1 1 120px" }}
             />
-          </Box>
-
-          <Stack direction="row" spacing={1.5}>
-            <Button onClick={resetDefaults} variant="outlined">
-              Reset to Default
-            </Button>
+            <Tooltip title="Reset to Default">
+              <IconButton onClick={resetDefaults} sx={{ mt: 1 }}>
+                <RestartAltIcon />
+              </IconButton>
+            </Tooltip>
             <Button
               onClick={addDraftToList}
               variant="contained"
               disabled={!draft.medicine}
+              sx={{ mt: 1 }}
             >
               Add Medicine
             </Button>
-          </Stack>
+          </Box>
+
+          <Divider />
+
+          {items.length > 0 ? (
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Medicine</TableCell>
+                  <TableCell>Dosage</TableCell>
+                  <TableCell>Eye</TableCell>
+                  <TableCell>Frequency</TableCell>
+                  <TableCell>Duration</TableCell>
+                  <TableCell align="right" />
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {items.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell sx={{ minWidth: 200 }}>
+                      <Typography variant="body2">{item.medicine}</Typography>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 110 }}>
+                      <TextField
+                        size="small"
+                        variant="standard"
+                        value={item.dosage}
+                        onChange={(event) =>
+                          updateItem(item.id, "dosage", event.target.value)
+                        }
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 110 }}>
+                      <TextField
+                        select
+                        size="small"
+                        variant="standard"
+                        value={item.eye}
+                        onChange={(event) =>
+                          updateItem(item.id, "eye", event.target.value)
+                        }
+                        fullWidth
+                      >
+                        <MenuItem value="Right">Right</MenuItem>
+                        <MenuItem value="Left">Left</MenuItem>
+                        <MenuItem value="Both">Both</MenuItem>
+                      </TextField>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 130 }}>
+                      <TextField
+                        size="small"
+                        variant="standard"
+                        value={item.frequency}
+                        onChange={(event) =>
+                          updateItem(item.id, "frequency", event.target.value)
+                        }
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell sx={{ minWidth: 110 }}>
+                      <TextField
+                        size="small"
+                        variant="standard"
+                        value={item.duration}
+                        onChange={(event) =>
+                          updateItem(item.id, "duration", event.target.value)
+                        }
+                        fullWidth
+                      />
+                    </TableCell>
+                    <TableCell align="right">
+                      <IconButton
+                        size="small"
+                        onClick={() => removeItem(item.id)}
+                      >
+                        <DeleteOutlineIcon fontSize="small" />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <Typography variant="body2" color="text.secondary">
+              No medicines added yet.
+            </Typography>
+          )}
         </Stack>
       </DialogContent>
       <DialogActions>

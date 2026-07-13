@@ -13,3 +13,4 @@ Timestamp,Doctor Username,Patient Code,Field,Value Snippet
 2026-07-13T14:13:48.894Z,sarwar,P-1001,plan,<ul><li><br></li></ul>
 2026-07-13T14:13:54.886Z,sarwar,P-1001,investigation,<ul><li><br></li></ul>
 2026-07-13T14:14:03.181Z,sarwar,P-1001,refractionSummary,<ul><li><br></li></ul>
+2026-07-13T14:48:01.970Z,sarwar,P-1001,rx,"[{""id"":""rx-legacy"",""medicine"":""Refresh Tears (Eye Drop) - Artificial Tear"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""3..."
