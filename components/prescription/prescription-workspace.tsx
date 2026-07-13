@@ -23,6 +23,7 @@ import type {
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
 import RichTextContent from "@/components/prescription/rich-text-content";
+import { isRichTextEmpty } from "@/lib/sanitize-html";
 import { formatRxItem, parseRxItems, stringifyRxItems } from "@/lib/rx";
 
 type SectionKey =
@@ -56,22 +57,22 @@ const LEFT_SECTIONS: Array<{
   detailKey: keyof PatientRecord;
 }> = [
   {
-    title: "Complaints",
+    title: "Complaints: ",
     summaryKey: "complaintsSummary",
     detailKey: "complaintsDetail",
   },
   {
-    title: "Vision",
+    title: "Vision: ",
     summaryKey: "visionSummary",
     detailKey: "visionDetail",
   },
   {
-    title: "History",
+    title: "History: ",
     summaryKey: "historySummary",
     detailKey: "historyDetail",
   },
   {
-    title: "Refraction",
+    title: "Refraction: ",
     summaryKey: "refractionSummary",
     detailKey: "refractionDetail",
   },
@@ -192,10 +193,7 @@ export default function PrescriptionWorkspace({
               </Typography>
             </Box>
             <Typography variant="caption" color="text.secondary">
-              {hospital.address}
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              {hospital.contact} | {hospital.website}
+              {hospital.address} | {hospital.contact} | {hospital.website}
             </Typography>
             <Typography variant="h6" sx={{ mt: 0.25, fontWeight: 700 }}>
               Prescription Sheet
@@ -243,25 +241,57 @@ export default function PrescriptionWorkspace({
             <Stack spacing={0.75} sx={{ height: "100%" }}>
               {LEFT_SECTIONS.map((section) => {
                 const summary = String(patient?.[section.summaryKey] ?? "");
-                const detail = String(patient?.[section.detailKey] ?? "");
+                const hasSummary = !isRichTextEmpty(summary);
+                const isHistory = section.title === "History";
                 return (
                   <Box key={section.title} sx={{ p: 0.75 }}>
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
+                        gap: 0.5,
                       }}
                     >
-                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
-                        {section.title}
-                      </Typography>
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "baseline",
+                          gap: 0.5,
+                          minWidth: 0,
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{ fontWeight: 700, whiteSpace: "nowrap" }}
+                        >
+                          {section.title}
+                          {isHistory ? ":" : ""}
+                        </Typography>
+                        {isHistory && hasSummary ? (
+                          <RichTextContent
+                            html={summary}
+                            sx={{
+                              display: "inline",
+                              fontSize: 11,
+                              color: "text.secondary",
+                              "& ul": {
+                                display: "inline",
+                                listStyleType: "none",
+                                pl: 0,
+                                m: 0,
+                              },
+                              "& li": { display: "inline" },
+                            }}
+                          />
+                        ) : null}
+                      </Box>
                       <Box sx={{ display: "flex", gap: 0.25 }}>
                         <Tooltip
-                          title={summary ? "Edit summary" : "Add summary"}
+                          title={hasSummary ? "Edit summary" : "Add summary"}
                         >
                           <IconButton
                             size="small"
+                            color={hasSummary ? "primary" : "success"}
                             sx={{ p: 0.25 }}
                             onClick={() =>
                               setEditor({
@@ -271,7 +301,7 @@ export default function PrescriptionWorkspace({
                               })
                             }
                           >
-                            {summary ? (
+                            {hasSummary ? (
                               <EditIcon sx={{ fontSize: 14 }} />
                             ) : (
                               <AddIcon sx={{ fontSize: 14 }} />
@@ -281,6 +311,7 @@ export default function PrescriptionWorkspace({
                         <Tooltip title="View/Edit details">
                           <IconButton
                             size="small"
+                            color="info"
                             sx={{ p: 0.25 }}
                             onClick={() =>
                               setEditor({
@@ -295,18 +326,14 @@ export default function PrescriptionWorkspace({
                         </Tooltip>
                       </Box>
                     </Box>
-                    <RichTextContent
-                      html={summary || "No summary yet."}
-                      sx={{
-                        mt: 0.25,
-                        fontSize: 11,
-                        color: "text.secondary",
-                      }}
-                    />
-                    {detail ? (
+                    {!isHistory && hasSummary ? (
                       <RichTextContent
-                        html={detail}
-                        sx={{ fontSize: 10, color: "text.secondary" }}
+                        html={summary}
+                        sx={{
+                          mt: 0.25,
+                          fontSize: 11,
+                          color: "text.secondary",
+                        }}
                       />
                     ) : null}
                   </Box>
@@ -314,20 +341,21 @@ export default function PrescriptionWorkspace({
               })}
 
               {[
-                ["Diagnosis", "diagnosis"],
-                ["Investigation", "investigation"],
-                ["Plan", "plan"],
+                ["Diagnosis: ", "diagnosis"],
+                ["Investigation: ", "investigation"],
+                ["Plan: ", "plan"],
               ].map(([label, key]) => {
                 const content = String(
                   patient?.[key as keyof PatientRecord] ?? "",
                 );
+                const hasContent = !isRichTextEmpty(content);
                 return (
                   <Box key={label} sx={{ p: 0.75 }}>
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
+                        gap: 0.5,
                       }}
                     >
                       <Typography variant="caption" sx={{ fontWeight: 700 }}>
@@ -335,6 +363,7 @@ export default function PrescriptionWorkspace({
                       </Typography>
                       <IconButton
                         size="small"
+                        color={hasContent ? "primary" : "success"}
                         sx={{ p: 0.25 }}
                         onClick={() =>
                           setEditor({
@@ -344,21 +373,23 @@ export default function PrescriptionWorkspace({
                           })
                         }
                       >
-                        {content ? (
+                        {hasContent ? (
                           <EditIcon sx={{ fontSize: 14 }} />
                         ) : (
                           <AddIcon sx={{ fontSize: 14 }} />
                         )}
                       </IconButton>
                     </Box>
-                    <RichTextContent
-                      html={content || "No entry yet."}
-                      sx={{
-                        mt: 0.25,
-                        fontSize: 11,
-                        color: "text.secondary",
-                      }}
-                    />
+                    {hasContent ? (
+                      <RichTextContent
+                        html={content}
+                        sx={{
+                          mt: 0.25,
+                          fontSize: 11,
+                          color: "text.secondary",
+                        }}
+                      />
+                    ) : null}
                   </Box>
                 );
               })}
@@ -379,12 +410,13 @@ export default function PrescriptionWorkspace({
                   sx={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
+                    gap: 0.5,
                   }}
                 >
                   <Typography variant="subtitle2">Rx.</Typography>
                   <IconButton
                     size="small"
+                    color={rxItems.length > 0 ? "primary" : "success"}
                     sx={{ p: 0.25 }}
                     onClick={() => setRxEditorOpen(true)}
                   >
@@ -430,13 +462,14 @@ export default function PrescriptionWorkspace({
                 const content = String(
                   patient?.[key as keyof PatientRecord] ?? "",
                 );
+                const hasContent = !isRichTextEmpty(content);
                 return (
                   <Box key={label} sx={{ p: 0.75 }}>
                     <Box
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        justifyContent: "space-between",
+                        gap: 0.5,
                       }}
                     >
                       <Typography variant="caption" sx={{ fontWeight: 700 }}>
@@ -444,6 +477,7 @@ export default function PrescriptionWorkspace({
                       </Typography>
                       <IconButton
                         size="small"
+                        color={hasContent ? "primary" : "success"}
                         sx={{ p: 0.25 }}
                         onClick={() =>
                           setEditor({
@@ -453,21 +487,23 @@ export default function PrescriptionWorkspace({
                           })
                         }
                       >
-                        {content ? (
+                        {hasContent ? (
                           <EditIcon sx={{ fontSize: 14 }} />
                         ) : (
                           <AddIcon sx={{ fontSize: 14 }} />
                         )}
                       </IconButton>
                     </Box>
-                    <RichTextContent
-                      html={content || "No entry yet."}
-                      sx={{
-                        mt: 0.25,
-                        fontSize: 11,
-                        color: "text.secondary",
-                      }}
-                    />
+                    {hasContent ? (
+                      <RichTextContent
+                        html={content}
+                        sx={{
+                          mt: 0.25,
+                          fontSize: 11,
+                          color: "text.secondary",
+                        }}
+                      />
+                    ) : null}
                   </Box>
                 );
               })}
@@ -492,7 +528,7 @@ export default function PrescriptionWorkspace({
                     {session.specialization}
                   </Typography>
                   <Typography variant="caption" color="text.secondary">
-                    Generated: {today} {now}
+                    {today} at {now}
                   </Typography>
                 </Box>
               </Box>

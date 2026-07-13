@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import type { SxProps, Theme } from "@mui/material";
-import { sanitizeRichText } from "@/lib/sanitize-html";
+import { ensureBulletHtml, sanitizeRichText } from "@/lib/sanitize-html";
 
 export default function RichTextContent({
   html,
@@ -12,11 +12,15 @@ export default function RichTextContent({
   return (
     <Box
       sx={{
-        "& ul, & ol": { pl: 2.5, m: 0 },
+        "& ul": { pl: 2.5, m: 0, listStyleType: "disc" },
+        "& ol": { pl: 2.5, m: 0, listStyleType: "decimal" },
+        "& li": { listStylePosition: "outside" },
         "& p": { m: 0 },
         ...sx,
       }}
-      dangerouslySetInnerHTML={{ __html: sanitizeRichText(html) }}
+      dangerouslySetInnerHTML={{
+        __html: ensureBulletHtml(sanitizeRichText(html)),
+      }}
     />
   );
 }

@@ -1,15 +1,99 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { Box, Divider, IconButton, Paper, Tooltip } from "@mui/material";
+import { Box, IconButton, Paper, Tooltip } from "@mui/material";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted";
-import FormatListNumberedIcon from "@mui/icons-material/FormatListNumbered";
 import { sanitizeRichText } from "@/lib/sanitize-html";
 
 export const EMPTY_BULLET_LIST = "<ul><li><br></li></ul>";
+
+/**
+ * Guarantees the content is always a single <ul> of <li> items. If the user
+ * (via browser default contentEditable behavior, e.g. pressing Enter twice
+ * on an empty item, or pasting) breaks out of the list, this rebuilds the
+ * content back into a bullet list, treating each stray block/text run as
+ * its own list item.
+ */
+function ensureBulletList(html: string): string {
+  const container = document.createElement("div");
+  container.innerHTML = html;
+
+  const topLevel = Array.from(container.childNodes).filter(
+    (node) => node.nodeType !== Node.TEXT_NODE || node.textContent?.trim(),
+  );
+
+  if (
+    topLevel.length === 1 &&
+    topLevel[0].nodeType === Node.ELEMENT_NODE &&
+    (topLevel[0] as Element).tagName === "UL"
+  ) {
+    return container.innerHTML;
+  }
+
+  const items: Element[] = [];
+
+  const collect = (node: ChildNode) => {
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent ?? "";
+      if (text.trim()) {
+        const li = document.createElement("li");
+        li.textContent = text;
+        items.push(li);
+      }
+      return;
+    }
+
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
+
+    const el = node as Element;
+    if (el.tagName === "UL" || el.tagName === "OL") {
+      Array.from(el.children).forEach((child) => {
+        if (child.tagName === "LI") {
+          items.push(child.cloneNode(true) as Element);
+        }
+      });
+      return;
+    }
+
+    if (el.tagName === "LI") {
+      items.push(el.cloneNode(true) as Element);
+      return;
+    }
+
+    if (el.tagName === "BR") {
+      return;
+    }
+
+    if (el.innerHTML.trim()) {
+      const li = document.createElement("li");
+      li.innerHTML = el.innerHTML;
+      items.push(li);
+    }
+  };
+
+  Array.from(container.childNodes).forEach(collect);
+
+  const ul = document.createElement("ul");
+  if (items.length === 0) {
+    items.push(document.createElement("li"));
+  }
+  items.forEach((item) => ul.appendChild(item));
+
+  return ul.outerHTML;
+}
+
+function placeCaretAtEnd(element: HTMLElement) {
+  const range = document.createRange();
+  range.selectNodeContents(element);
+  range.collapse(false);
+  const selection = window.getSelection();
+  selection?.removeAllRanges();
+  selection?.addRange(range);
+}
 
 export default function RichTextEditor({
   value,
@@ -28,19 +112,33 @@ export default function RichTextEditor({
       return;
     }
     initialized.current = true;
-    const initialHtml = value.trim() ? value : EMPTY_BULLET_LIST;
+    const initialHtml = ensureBulletList(
+      sanitizeRichText(value.trim() ? value : EMPTY_BULLET_LIST),
+    );
     editorRef.current.innerHTML = initialHtml;
-    if (!value.trim()) {
-      onChange(initialHtml);
-    }
+    onChange(initialHtml);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function applyChange(rawHtml: string) {
+    const editor = editorRef.current;
+    if (!editor) {
+      return;
+    }
+    const sanitized = sanitizeRichText(rawHtml);
+    const normalized = ensureBulletList(sanitized);
+    if (normalized !== rawHtml) {
+      editor.innerHTML = normalized;
+      placeCaretAtEnd(editor);
+    }
+    onChange(normalized);
+  }
 
   function exec(command: string) {
     editorRef.current?.focus();
     document.execCommand(command);
     if (editorRef.current) {
-      onChange(sanitizeRichText(editorRef.current.innerHTML));
+      applyChange(editorRef.current.innerHTML);
     }
   }
 
@@ -72,25 +170,12 @@ export default function RichTextEditor({
             <FormatUnderlinedIcon fontSize="small" />
           </IconButton>
         </Tooltip>
-        <Divider orientation="vertical" flexItem sx={{ mx: 0.5, my: 0.5 }} />
-        <Tooltip title="Bulleted list">
-          <IconButton size="small" onClick={() => exec("insertUnorderedList")}>
-            <FormatListBulletedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-        <Tooltip title="Numbered list">
-          <IconButton size="small" onClick={() => exec("insertOrderedList")}>
-            <FormatListNumberedIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
       </Box>
       <Box
         ref={editorRef}
         contentEditable
         suppressContentEditableWarning
-        onInput={(event) =>
-          onChange(sanitizeRichText(event.currentTarget.innerHTML))
-        }
+        onInput={(event) => applyChange(event.currentTarget.innerHTML)}
         sx={{
           minHeight,
           maxHeight: 420,
@@ -99,8 +184,11 @@ export default function RichTextEditor({
           py: 1.5,
           fontSize: 14,
           lineHeight: 1.6,
+          color: "text.primary",
           outline: "none",
-          "& ul, & ol": { pl: 3, m: 0 },
+          "& ul": { pl: 3, m: 0, listStyleType: "disc" },
+          "& ol": { pl: 3, m: 0, listStyleType: "decimal" },
+          "& li": { listStylePosition: "outside" },
         }}
       />
     </Paper>

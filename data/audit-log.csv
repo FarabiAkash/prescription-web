@@ -1,0 +1,15 @@
+Timestamp,Doctor Username,Patient Code,Field,Value Snippet
+2026-07-13T13:54:18.868Z,sarwar,P-1001,complaintsSummary,"Defective vision (2 weeks), redness, pain (3 days)<br>Defective vision (2 weeks), redness, pain (3 days)<br>Defective vi..."
+2026-07-13T13:57:28.171Z,sarwar,P-1001,complaintsSummary,"Defective vision (2 weeks), redness, pain (3 days)<div>Defective vision (2 weeks), redness, pain (3 days)</div>"
+2026-07-13T14:00:44.261Z,sarwar,P-1001,complaintsSummary,"<ul><li>Defective vision (2 weeks), redness, pain (3 days)</li><li>Defective vision (2 weeks), redness, pain (3 days)</l..."
+2026-07-13T14:05:16.799Z,sarwar,P-1001,visionSummary,"<ul><li>UCVA: R 2/60, L 6/6</li></ul>"
+2026-07-13T14:06:02.244Z,sarwar,P-1001,refractionSummary,"<ul><li>R: -1.00 DS, L: Plano</li></ul>"
+2026-07-13T14:06:04.875Z,sarwar,P-1001,historySummary,<ul><li>NTN (5 years)</li></ul>
+2026-07-13T14:06:08.599Z,sarwar,P-1001,diagnosis,<ul><li>Dry Eye Syndrome</li></ul>
+2026-07-13T14:06:12.206Z,sarwar,P-1001,investigation,<ul><li>Tear breakup time and Schirmer test</li></ul>
+2026-07-13T14:06:15.424Z,sarwar,P-1001,plan,<ul><li>Lubrication + follow-up</li></ul>
+2026-07-13T14:07:29.883Z,sarwar,P-1001,historySummary,<ul><li>NTN (5 years)</li></ul>
+2026-07-13T14:13:42.766Z,sarwar,P-1001,plan,<ul><li><br></li></ul>
+2026-07-13T14:13:48.894Z,sarwar,P-1001,plan,<ul><li><br></li></ul>
+2026-07-13T14:13:54.886Z,sarwar,P-1001,investigation,<ul><li><br></li></ul>
+2026-07-13T14:14:03.181Z,sarwar,P-1001,refractionSummary,<ul><li><br></li></ul>
