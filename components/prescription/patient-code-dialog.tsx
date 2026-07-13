@@ -14,18 +14,30 @@ import {
 } from "@mui/material";
 import type { PatientRecord } from "@/types/portal";
 
+function defaultCodeFrom(patientCode?: string): string {
+  if (!patientCode) {
+    return "001";
+  }
+  const lastThree = patientCode.slice(-3);
+  return lastThree || "001";
+}
+
 export default function PatientCodeDialog({
   open,
   patientName,
+  patientCode: initialPatientCode,
   onPatientLoaded,
   onClose,
 }: {
   open: boolean;
   patientName?: string;
+  patientCode?: string;
   onPatientLoaded: (patient: PatientRecord) => void;
   onClose?: () => void;
 }) {
-  const [patientCode, setPatientCode] = useState("001");
+  const [patientCode, setPatientCode] = useState(() =>
+    defaultCodeFrom(initialPatientCode),
+  );
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -71,8 +83,8 @@ export default function PatientCodeDialog({
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Load patient details from CSV by entering the last 3 digits of the
-            patient code. e.g. 001, 002, 003
+            Load patient details from the demo records by entering the last 3
+            digits of the patient code. e.g. 001, 002, 003
           </Typography>
           {error ? <Alert severity="error">{error}</Alert> : null}
           <TextField
