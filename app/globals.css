@@ -34,7 +34,17 @@ body {
 }
 
 @media print {
+  @page {
+    /* Matches the on-screen 16:9 prescription paper so the exact same
+       layout (which already fits that shape) fits print with no reflow. */
+    size: 297mm 167mm;
+    margin: 0;
+  }
+
+  html,
   body {
+    margin: 0;
+    padding: 0;
     background: #ffffff;
   }
 
@@ -42,8 +52,16 @@ body {
     max-width: none;
     aspect-ratio: auto;
     width: 297mm;
-    min-height: 210mm;
+    height: 167mm;
+    margin: 0;
+    overflow: hidden;
     box-shadow: none;
     border: none;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  .no-print {
+    display: none !important;
   }
 }

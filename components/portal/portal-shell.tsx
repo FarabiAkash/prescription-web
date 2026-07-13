@@ -152,6 +152,7 @@ export default function PortalShell({
         position="fixed"
         color="inherit"
         elevation={0}
+        className="no-print"
         sx={{
           width: { sm: `calc(100% - ${SIDEBAR_WIDTH}px)` },
           ml: { sm: `${SIDEBAR_WIDTH}px` },
@@ -201,6 +202,7 @@ export default function PortalShell({
 
       <Drawer
         variant="permanent"
+        className="no-print"
         sx={{
           width: SIDEBAR_WIDTH,
           flexShrink: 0,
@@ -300,6 +302,10 @@ export default function PortalShell({
           mt: 8,
           p: { xs: 2, sm: 3 },
           minWidth: 0,
+          "@media print": {
+            mt: 0,
+            p: 0,
+          },
         }}
       >
         {children}

@@ -14,6 +14,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import PrintIcon from "@mui/icons-material/Print";
 import Image from "next/image";
 import type {
   MedicineRecord,
@@ -169,11 +170,35 @@ export default function PrescriptionWorkspace({
       <Paper
         className="rx-paper"
         sx={{
+          position: "relative",
           p: { xs: 1.25, md: 1.75 },
           px: { xs: 2, sm: 3, md: 4 },
           border: "1px solid #d8e2eb",
         }}
       >
+        <Tooltip title="Print prescription">
+          <IconButton
+            onClick={() => window.print()}
+            className="no-print"
+            sx={{
+              position: "absolute",
+              top: 8,
+              right: 8,
+              zIndex: 1,
+              color: "primary.main",
+              backgroundColor: "transparent",
+              border: "1px solid",
+              borderColor: "primary.main",
+              transition: "background-color 0.15s ease, color 0.15s ease",
+              "&:hover": {
+                backgroundColor: "primary.main",
+                color: "primary.contrastText",
+              },
+            }}
+          >
+            <PrintIcon fontSize="small" />
+          </IconButton>
+        </Tooltip>
         <Stack spacing={1} sx={{ height: "100%" }}>
           <Box
             sx={{
@@ -208,6 +233,9 @@ export default function PrescriptionWorkspace({
               display: "grid",
               gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
               gap: 0.5,
+              "@media print": {
+                gridTemplateColumns: "1fr 1fr",
+              },
             }}
           >
             <Typography variant="body2" sx={{ fontWeight: 700 }}>
@@ -215,7 +243,11 @@ export default function PrescriptionWorkspace({
             </Typography>
             <Typography
               variant="body2"
-              sx={{ fontWeight: 700, textAlign: { xs: "left", md: "right" } }}
+              sx={{
+                fontWeight: 700,
+                textAlign: { xs: "left", md: "right" },
+                "@media print": { textAlign: "right" },
+              }}
             >
               ID: {patient?.patientCode ?? "-"}
             </Typography>
@@ -224,7 +256,11 @@ export default function PrescriptionWorkspace({
             </Typography>
             <Typography
               variant="body2"
-              sx={{ fontWeight: 700, textAlign: { xs: "left", md: "right" } }}
+              sx={{
+                fontWeight: 700,
+                textAlign: { xs: "left", md: "right" },
+                "@media print": { textAlign: "right" },
+              }}
             >
               Date: {today}
             </Typography>
@@ -239,6 +275,9 @@ export default function PrescriptionWorkspace({
               gap: 1.25,
               flexGrow: 1,
               alignItems: "stretch",
+              "@media print": {
+                gridTemplateColumns: "3fr auto 7fr",
+              },
             }}
           >
             <Stack spacing={0.75} sx={{ height: "100%" }}>
@@ -401,7 +440,12 @@ export default function PrescriptionWorkspace({
             <Divider
               orientation="vertical"
               flexItem
-              sx={{ display: { xs: "none", lg: "block" } }}
+              sx={{
+                display: { xs: "none", lg: "block" },
+                "@media print": {
+                  display: "block",
+                },
+              }}
             />
 
             <Stack
@@ -416,7 +460,9 @@ export default function PrescriptionWorkspace({
                     gap: 0.5,
                   }}
                 >
-                  <Typography variant="subtitle2">Rx.</Typography>
+                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                    Rx.
+                  </Typography>
                   <IconButton
                     size="small"
                     color={rxItems.length > 0 ? "primary" : "success"}
@@ -453,16 +499,20 @@ export default function PrescriptionWorkspace({
                       return (
                         <Box key={item.id} component="li">
                           <Typography
-                            variant="body2"
-                            sx={{ fontWeight: 700, display: "block" }}
+                            variant="caption"
+                            sx={{
+                              fontWeight: 700,
+                              fontSize: 11,
+                              display: "block",
+                            }}
                           >
                             {item.medicine}
                           </Typography>
                           {usageParts.length > 0 ? (
                             <Typography
-                              variant="body2"
+                              variant="caption"
                               color="text.secondary"
-                              sx={{ display: "block" }}
+                              sx={{ fontSize: 11, display: "block" }}
                             >
                               {usageParts.join(" --------------- ")}
                             </Typography>
