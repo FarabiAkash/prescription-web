@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Alert,
   Button,
@@ -25,9 +25,10 @@ export default function PatientCodeDialog({
   onPatientLoaded: (patient: PatientRecord) => void;
   onClose?: () => void;
 }) {
-  const [patientCode, setPatientCode] = useState("");
+  const [patientCode, setPatientCode] = useState("001");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleLookup() {
     setLoading(true);
@@ -50,7 +51,20 @@ export default function PatientCodeDialog({
   }
 
   return (
-    <Dialog open={open} fullWidth maxWidth="sm" onClose={onClose}>
+    <Dialog
+      open={open}
+      fullWidth
+      maxWidth="sm"
+      onClose={onClose}
+      slotProps={{
+        transition: {
+          onEntered: () => {
+            inputRef.current?.focus();
+            inputRef.current?.select();
+          },
+        },
+      }}
+    >
       <DialogTitle>
         {patientName ? `Confirm Code for ${patientName}` : "Enter Patient Code"}
       </DialogTitle>
@@ -66,6 +80,7 @@ export default function PatientCodeDialog({
             label="Patient Code (last 3 digits)"
             value={patientCode}
             onChange={(event) => setPatientCode(event.target.value)}
+            onFocus={(event) => event.target.select()}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
                 event.preventDefault();
@@ -73,7 +88,7 @@ export default function PatientCodeDialog({
               }
             }}
             placeholder="e.g. 001, 002, 003"
-            slotProps={{ htmlInput: { maxLength: 3 } }}
+            slotProps={{ htmlInput: { maxLength: 3, ref: inputRef } }}
           />
         </Stack>
       </DialogContent>

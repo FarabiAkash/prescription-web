@@ -3,11 +3,14 @@
 import { useMemo, useState } from "react";
 import {
   AppBar,
+  Avatar,
   Box,
   Button,
+  Divider,
   Drawer,
   List,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   Toolbar,
   Typography,
@@ -15,18 +18,70 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { PropsWithChildren } from "react";
 import type { SessionUser, SidebarModule } from "@/types/portal";
+import PeopleAltRoundedIcon from "@mui/icons-material/PeopleAltRounded";
+import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
+import ReportProblemRoundedIcon from "@mui/icons-material/ReportProblemRounded";
+import VisibilityRoundedIcon from "@mui/icons-material/VisibilityRounded";
+import CenterFocusStrongRoundedIcon from "@mui/icons-material/CenterFocusStrongRounded";
+import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
+import MedicalServicesRoundedIcon from "@mui/icons-material/MedicalServicesRounded";
+import TipsAndUpdatesRoundedIcon from "@mui/icons-material/TipsAndUpdatesRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import type { SvgIconComponent } from "@mui/icons-material";
 
-const SIDEBAR_WIDTH = 250;
+const SIDEBAR_WIDTH = 264;
 
-const MODULES: Array<{ label: SidebarModule; path: string }> = [
-  { label: "Patients", path: "/portal/patients" },
-  { label: "Prescription", path: "/portal/prescription" },
-  { label: "Complaints", path: "/portal/prescription?tab=complaints" },
-  { label: "Vision", path: "/portal/prescription?tab=vision" },
-  { label: "Refraction", path: "/portal/prescription?tab=refraction" },
-  { label: "History", path: "/portal/prescription?tab=history" },
-  { label: "Diagnosis", path: "/portal/prescription?tab=diagnosis" },
-  { label: "Advice", path: "/portal/prescription?tab=advice" },
+type ModuleItem = {
+  label: SidebarModule;
+  path: string;
+  icon: SvgIconComponent;
+  requiresPatient?: boolean;
+};
+
+const MODULES: ModuleItem[] = [
+  { label: "Patients", path: "/portal/patients", icon: PeopleAltRoundedIcon },
+  {
+    label: "Prescription",
+    path: "/portal/prescription",
+    icon: DescriptionRoundedIcon,
+    requiresPatient: true,
+  },
+  {
+    label: "Complaints",
+    path: "/portal/prescription?tab=complaints",
+    icon: ReportProblemRoundedIcon,
+    requiresPatient: true,
+  },
+  {
+    label: "Vision",
+    path: "/portal/prescription?tab=vision",
+    icon: VisibilityRoundedIcon,
+    requiresPatient: true,
+  },
+  {
+    label: "Refraction",
+    path: "/portal/prescription?tab=refraction",
+    icon: CenterFocusStrongRoundedIcon,
+    requiresPatient: true,
+  },
+  {
+    label: "History",
+    path: "/portal/prescription?tab=history",
+    icon: HistoryRoundedIcon,
+    requiresPatient: true,
+  },
+  {
+    label: "Diagnosis",
+    path: "/portal/prescription?tab=diagnosis",
+    icon: MedicalServicesRoundedIcon,
+    requiresPatient: true,
+  },
+  {
+    label: "Advice",
+    path: "/portal/prescription?tab=advice",
+    icon: TipsAndUpdatesRoundedIcon,
+    requiresPatient: true,
+  },
 ];
 
 export default function PortalShell({
@@ -38,10 +93,36 @@ export default function PortalShell({
   const searchParams = useSearchParams();
   const [busy, setBusy] = useState(false);
 
+  const patientCode = searchParams.get("code");
+  const hasPatient = Boolean(patientCode);
+  const tab = searchParams.get("tab");
+
+  const visibleModules = useMemo(
+    () => MODULES.filter((item) => !item.requiresPatient || hasPatient),
+    [hasPatient],
+  );
+
   const active = useMemo(() => {
-    return MODULES.find((item) => pathname.startsWith(item.path.split("?")[0]))
-      ?.label;
-  }, [pathname]);
+    if (!pathname.startsWith("/portal/prescription")) {
+      return MODULES.find((item) => pathname.startsWith(item.path))?.label;
+    }
+    const match = MODULES.find((item) => {
+      const [base, query] = item.path.split("?");
+      if (base !== "/portal/prescription") {
+        return false;
+      }
+      const itemTab = query ? new URLSearchParams(query).get("tab") : null;
+      return itemTab === tab;
+    });
+    return match?.label;
+  }, [pathname, tab]);
+
+  const initials = session.doctorName
+    .split(" ")
+    .filter((part) => /^[A-Za-z]/.test(part))
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
 
   function handleNavigate(path: string) {
     const [base, query] = path.split("?");
@@ -70,10 +151,11 @@ export default function PortalShell({
       <AppBar
         position="fixed"
         color="inherit"
+        elevation={0}
         sx={{
           width: { sm: `calc(100% - ${SIDEBAR_WIDTH}px)` },
           ml: { sm: `${SIDEBAR_WIDTH}px` },
-          borderBottom: "1px solid #d8e2eb",
+          borderBottom: "1px solid #e3eaf0",
           backgroundColor: "#ffffff",
         }}
       >
@@ -92,9 +174,27 @@ export default function PortalShell({
                 Signed in as {session.doctorName}
               </Typography>
             </Box>
-            <Button onClick={handleLogout} disabled={busy} variant="outlined">
-              Logout
-            </Button>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Avatar
+                sx={{
+                  width: 36,
+                  height: 36,
+                  bgcolor: "primary.main",
+                  fontSize: 14,
+                  fontWeight: 700,
+                }}
+              >
+                {initials || "DR"}
+              </Avatar>
+              <Button
+                onClick={handleLogout}
+                disabled={busy}
+                variant="outlined"
+                startIcon={<LogoutRoundedIcon />}
+              >
+                Logout
+              </Button>
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>
@@ -107,33 +207,90 @@ export default function PortalShell({
           [`& .MuiDrawer-paper`]: {
             width: SIDEBAR_WIDTH,
             boxSizing: "border-box",
-            borderRight: "1px solid #d8e2eb",
+            borderRight: "1px solid #e3eaf0",
+            backgroundColor: "#ffffff",
+            color: "#1d2b36",
           },
         }}
       >
-        <Toolbar>
-          <Typography variant="h6">Modules</Typography>
+        <Toolbar sx={{ px: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{ color: "primary.main", fontWeight: 800, letterSpacing: 0.4 }}
+          >
+            Modules
+          </Typography>
         </Toolbar>
-        <List sx={{ px: 1 }}>
-          {MODULES.map((item) => (
-            <ListItemButton
-              key={item.label}
-              selected={active === item.label}
-              onClick={() => handleNavigate(item.path)}
-              sx={{ borderRadius: 2, mb: 0.5 }}
-            >
-              <ListItemText
-                primary={
-                  <Typography
-                    sx={{ fontWeight: active === item.label ? 700 : 500 }}
-                  >
-                    {item.label}
-                  </Typography>
-                }
-              />
-            </ListItemButton>
-          ))}
+        <List sx={{ px: 1.5, py: 1 }}>
+          {visibleModules.map((item) => {
+            const Icon = item.icon;
+            const isActive = active === item.label;
+            return (
+              <ListItemButton
+                key={item.label}
+                selected={isActive}
+                onClick={() => handleNavigate(item.path)}
+                sx={{
+                  borderRadius: 1,
+                  mb: 0.5,
+                  pl: 1.75,
+                  borderLeft: "3px solid transparent",
+                  color: "text.secondary",
+                  transition: "background-color 0.15s ease, color 0.15s ease",
+                  "&:hover": {
+                    backgroundColor: "rgba(4,102,156,0.06)",
+                    color: "primary.main",
+                  },
+                  "&.Mui-selected": {
+                    backgroundColor: "rgba(4,102,156,0.09)",
+                    borderLeft: "3px solid",
+                    borderLeftColor: "primary.main",
+                    color: "primary.main",
+                  },
+                  "&.Mui-selected:hover": {
+                    backgroundColor: "rgba(4,102,156,0.12)",
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    minWidth: 36,
+                    color: isActive ? "primary.main" : "text.secondary",
+                  }}
+                >
+                  <Icon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText
+                  primary={
+                    <Typography
+                      sx={{ fontWeight: isActive ? 700 : 500, fontSize: 14 }}
+                    >
+                      {item.label}
+                    </Typography>
+                  }
+                />
+              </ListItemButton>
+            );
+          })}
         </List>
+
+        {!hasPatient ? (
+          <>
+            <Divider sx={{ mx: 2 }} />
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{
+                px: 3,
+                py: 2,
+                display: "block",
+                lineHeight: 1.5,
+              }}
+            >
+              Select a patient to unlock the prescription workflow sections.
+            </Typography>
+          </>
+        ) : null}
       </Drawer>
 
       <Box

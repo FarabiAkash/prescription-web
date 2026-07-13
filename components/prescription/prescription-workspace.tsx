@@ -26,6 +26,7 @@ import type {
 } from "@/types/portal";
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
+import RichTextContent from "@/components/prescription/rich-text-content";
 import { formatRxItem, parseRxItems, stringifyRxItems } from "@/lib/rx";
 
 type SectionKey =
@@ -321,17 +322,19 @@ export default function PrescriptionWorkspace({
                         </Tooltip>
                       </Box>
                     </Box>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 0.8 }}
-                    >
-                      {summary || "No summary yet."}
-                    </Typography>
+                    <RichTextContent
+                      html={summary || "No summary yet."}
+                      sx={{
+                        mt: 0.8,
+                        fontSize: 14,
+                        color: "text.secondary",
+                      }}
+                    />
                     {detail ? (
-                      <Typography variant="caption" color="text.secondary">
-                        {detail}
-                      </Typography>
+                      <RichTextContent
+                        html={detail}
+                        sx={{ fontSize: 12, color: "text.secondary" }}
+                      />
                     ) : null}
                   </Paper>
                 );
@@ -372,13 +375,14 @@ export default function PrescriptionWorkspace({
                         )}
                       </IconButton>
                     </Box>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 0.6 }}
-                    >
-                      {content || "No entry yet."}
-                    </Typography>
+                    <RichTextContent
+                      html={content || "No entry yet."}
+                      sx={{
+                        mt: 0.6,
+                        fontSize: 14,
+                        color: "text.secondary",
+                      }}
+                    />
                   </Paper>
                 );
               })}
@@ -463,13 +467,14 @@ export default function PrescriptionWorkspace({
                         )}
                       </IconButton>
                     </Box>
-                    <Typography
-                      variant="body2"
-                      color="text.secondary"
-                      sx={{ mt: 0.8 }}
-                    >
-                      {content || "No entry yet."}
-                    </Typography>
+                    <RichTextContent
+                      html={content || "No entry yet."}
+                      sx={{
+                        mt: 0.8,
+                        fontSize: 14,
+                        color: "text.secondary",
+                      }}
+                    />
                   </Paper>
                 );
               })}

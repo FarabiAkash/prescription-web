@@ -8,14 +8,13 @@ import {
   DialogContent,
   DialogTitle,
   Stack,
-  TextField,
 } from "@mui/material";
+import RichTextEditor from "@/components/prescription/rich-text-editor";
 
 export default function SectionEditorDialog({
   open,
   title,
   value,
-  multiline = true,
   onCancel,
   onSave,
 }: {
@@ -33,13 +32,7 @@ export default function SectionEditorDialog({
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <Stack sx={{ mt: 1 }}>
-          <TextField
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            multiline={multiline}
-            minRows={multiline ? 5 : undefined}
-            fullWidth
-          />
+          <RichTextEditor value={draft} onChange={setDraft} />
         </Stack>
       </DialogContent>
       <DialogActions>

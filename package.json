@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^9.2.0",
     "@mui/material": "^9.2.0",
+    "@mui/material-nextjs": "^9.1.1",
     "clsx": "^2.1.1",
     "csv-parse": "^7.0.1",
     "csv-stringify": "^6.8.1",

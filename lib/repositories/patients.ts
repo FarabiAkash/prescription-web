@@ -1,5 +1,6 @@
 import { DATA_FILES } from "@/lib/csv/paths";
 import { readCsv, writeCsv } from "@/lib/csv/file";
+import { sanitizeRichText } from "@/lib/sanitize-html";
 import type { PatientRecord } from "@/types/portal";
 
 type PatientsCsvRow = {
@@ -143,9 +144,17 @@ export async function updatePatientRecord(
   }
 
   const current = mapPatient(rows[index]);
+  const sanitizedUpdates = Object.fromEntries(
+    Object.entries(updates).map(([field, fieldValue]) => [
+      field,
+      typeof fieldValue === "string"
+        ? sanitizeRichText(fieldValue)
+        : fieldValue,
+    ]),
+  ) as Partial<PatientRecord>;
   const merged = {
     ...current,
-    ...updates,
+    ...sanitizedUpdates,
   } satisfies PatientRecord;
 
   rows[index] = toCsvRow(merged);
