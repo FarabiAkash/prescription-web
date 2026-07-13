@@ -35,6 +35,7 @@ export default async function PrescriptionPage({
         session={session}
         medicines={bootstrap.medicines}
         sets={bootstrap.sets}
+        diagnoses={bootstrap.diagnoses}
         hospital={bootstrap.hospital}
         today={bootstrap.today}
         now={bootstrap.now}

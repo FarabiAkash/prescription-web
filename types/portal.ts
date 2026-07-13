@@ -17,6 +17,7 @@ export type DoctorRecord = {
   specialization: string;
   hospitalDepartment: string;
   registrationNumber: string;
+  favoriteDiagnoses: string[];
 };
 
 export type PatientRecord = {
@@ -68,10 +69,16 @@ export type MedicineSetRecord = {
   items: MedicineSetItem[];
 };
 
+export type DiagnosisRecord = {
+  name: string;
+  category: string;
+};
+
 export type SessionUser = {
   username: string;
   doctorName: string;
   designation: string;
   specialization: string;
   registrationNumber: string;
+  favoriteDiagnoses: string[];
 };

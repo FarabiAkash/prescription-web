@@ -29,6 +29,7 @@ export async function POST(request: Request) {
     designation: doctor.designation,
     specialization: doctor.specialization,
     registrationNumber: doctor.registrationNumber,
+    favoriteDiagnoses: doctor.favoriteDiagnoses,
   });
 
   return NextResponse.json({ ok: true });

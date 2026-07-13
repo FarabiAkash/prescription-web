@@ -17,6 +17,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import PrintIcon from "@mui/icons-material/Print";
 import Image from "next/image";
 import type {
+  DiagnosisRecord,
   MedicineRecord,
   MedicineSetRecord,
   PatientRecord,
@@ -24,9 +25,21 @@ import type {
 } from "@/types/portal";
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
+import DiagnosisPickerDialog from "@/components/prescription/diagnosis-picker-dialog";
 import RichTextContent from "@/components/prescription/rich-text-content";
 import { isRichTextEmpty } from "@/lib/sanitize-html";
 import { parseRxItems, stringifyRxItems } from "@/lib/rx";
+import { parseDiagnosisItems, stringifyDiagnosisItems } from "@/lib/diagnosis";
+
+const EYE_ABBREVIATIONS: Record<string, string> = {
+  Left: "LE",
+  Right: "RE",
+  Both: "BE",
+};
+
+function formatEyeAbbreviation(eye: string): string {
+  return EYE_ABBREVIATIONS[eye] ?? eye;
+}
 
 type SectionKey =
   | "complaintsSummary"
@@ -37,7 +50,6 @@ type SectionKey =
   | "refractionDetail"
   | "historySummary"
   | "historyDetail"
-  | "diagnosis"
   | "investigation"
   | "plan"
   | "glassPrediction"
@@ -49,7 +61,6 @@ const TAB_TO_SECTION: Record<string, { key: SectionKey; title: string }> = {
   vision: { key: "visionDetail", title: "Vision Details" },
   refraction: { key: "refractionDetail", title: "Refraction Details" },
   history: { key: "historyDetail", title: "History Details" },
-  diagnosis: { key: "diagnosis", title: "Diagnosis" },
   advice: { key: "advice", title: "Advice" },
 };
 
@@ -90,6 +101,7 @@ export default function PrescriptionWorkspace({
   session,
   medicines,
   sets,
+  diagnoses,
   hospital,
   today,
   now,
@@ -98,6 +110,7 @@ export default function PrescriptionWorkspace({
   session: SessionUser;
   medicines: MedicineRecord[];
   sets: MedicineSetRecord[];
+  diagnoses: DiagnosisRecord[];
   hospital: {
     hospitalName: string;
     address: string;
@@ -116,8 +129,13 @@ export default function PrescriptionWorkspace({
   const [patient, setPatient] = useState<PatientRecord | null>(initialPatient);
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [rxEditorOpen, setRxEditorOpen] = useState(false);
+  const [diagnosisEditorOpen, setDiagnosisEditorOpen] = useState(false);
 
   const rxItems = useMemo(() => parseRxItems(patient?.rx ?? ""), [patient?.rx]);
+  const diagnosisItems = useMemo(
+    () => parseDiagnosisItems(patient?.diagnosis ?? ""),
+    [patient?.diagnosis],
+  );
 
   const tabMapping = tab ? TAB_TO_SECTION[tab] : undefined;
   const activeEditor: EditorState | null =
@@ -125,6 +143,7 @@ export default function PrescriptionWorkspace({
     (tabMapping && patient
       ? { key: tabMapping.key, title: tabMapping.title, open: true }
       : null);
+  const diagnosisDialogOpen = diagnosisEditorOpen || tab === "diagnosis";
 
   function clearTabParam() {
     if (!tab) {
@@ -138,6 +157,11 @@ export default function PrescriptionWorkspace({
 
   function closeEditor() {
     setEditor(null);
+    clearTabParam();
+  }
+
+  function closeDiagnosisEditor() {
+    setDiagnosisEditorOpen(false);
     clearTabParam();
   }
 
@@ -382,8 +406,61 @@ export default function PrescriptionWorkspace({
                 );
               })}
 
+              <Box sx={{ p: 0.75 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.5,
+                  }}
+                >
+                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                    Diagnosis:{" "}
+                  </Typography>
+                  <IconButton
+                    size="small"
+                    color={diagnosisItems.length > 0 ? "primary" : "success"}
+                    sx={{ p: 0.25 }}
+                    onClick={() => setDiagnosisEditorOpen(true)}
+                  >
+                    {diagnosisItems.length > 0 ? (
+                      <EditIcon sx={{ fontSize: 14 }} />
+                    ) : (
+                      <AddIcon sx={{ fontSize: 14 }} />
+                    )}
+                  </IconButton>
+                </Box>
+                {diagnosisItems.length > 0 ? (
+                  <Stack
+                    component="ul"
+                    spacing={0.25}
+                    sx={{
+                      mt: 0.25,
+                      pl: 2,
+                      m: 0,
+                      listStyleType: "disc",
+                      "& li": { listStylePosition: "outside" },
+                    }}
+                  >
+                    {diagnosisItems.map((item) => (
+                      <Box component="li" key={item.id}>
+                        <Typography
+                          variant="caption"
+                          color="text.secondary"
+                          sx={{ fontSize: 11 }}
+                        >
+                          {item.name}
+                          {item.eye
+                            ? ` (${formatEyeAbbreviation(item.eye)})`
+                            : ""}
+                        </Typography>
+                      </Box>
+                    ))}
+                  </Stack>
+                ) : null}
+              </Box>
+
               {[
-                ["Diagnosis: ", "diagnosis"],
                 ["Investigation: ", "investigation"],
                 ["Plan: ", "plan"],
               ].map(([label, key]) => {
@@ -649,6 +726,19 @@ export default function PrescriptionWorkspace({
         onSave={async (nextItems) => {
           await saveField("rx", stringifyRxItems(nextItems));
           setRxEditorOpen(false);
+        }}
+      />
+
+      <DiagnosisPickerDialog
+        key={`dx-${patient?.patientCode ?? "none"}-${patient?.diagnosis ?? ""}`}
+        open={diagnosisDialogOpen}
+        diagnoses={diagnoses}
+        favorites={session.favoriteDiagnoses ?? []}
+        initialItems={diagnosisItems}
+        onCancel={closeDiagnosisEditor}
+        onSave={async (nextItems) => {
+          await saveField("diagnosis", stringifyDiagnosisItems(nextItems));
+          closeDiagnosisEditor();
         }}
       />
     </Stack>

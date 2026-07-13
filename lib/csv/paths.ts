@@ -8,5 +8,6 @@ export const DATA_FILES = {
   medicine: path.join(DATA_DIR, "medicine.csv"),
   patients: path.join(DATA_DIR, "patients.csv"),
   sets: path.join(DATA_DIR, "sets.csv"),
+  diagnosis: path.join(DATA_DIR, "diagnosis.csv"),
   auditLog: path.join(DATA_DIR, "audit-log.csv"),
 } as const;

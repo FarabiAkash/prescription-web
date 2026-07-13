@@ -53,9 +53,7 @@ export default function PatientsList({
             >
               <ListItemText
                 primary={`${patient.patientName} (${patient.patientCode})`}
-                secondary={`${patient.sex}, Age ${patient.age}${
-                  patient.diagnosis ? ` — ${patient.diagnosis}` : ""
-                }`}
+                secondary={`${patient.sex}, Age ${patient.age}`}
               />
             </ListItemButton>
           ))}

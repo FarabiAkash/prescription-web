@@ -11,6 +11,7 @@ type DoctorsCsvRow = {
   Specialization: string;
   "Hospital Department": string;
   "Registration Number": string;
+  "Favorite Diagnoses": string;
 };
 
 function mapDoctor(row: DoctorsCsvRow): DoctorRecord {
@@ -23,6 +24,9 @@ function mapDoctor(row: DoctorsCsvRow): DoctorRecord {
     specialization: row.Specialization,
     hospitalDepartment: row["Hospital Department"],
     registrationNumber: row["Registration Number"],
+    favoriteDiagnoses: row["Favorite Diagnoses"]
+      ? row["Favorite Diagnoses"].split("|").map((item) => item.trim())
+      : [],
   };
 }
 
