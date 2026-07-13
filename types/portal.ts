@@ -1,4 +1,5 @@
 export type SidebarModule =
+  | "Patients"
   | "Prescription"
   | "Complaints"
   | "Vision"

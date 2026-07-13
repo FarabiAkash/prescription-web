@@ -16,10 +16,14 @@ import type { PatientRecord } from "@/types/portal";
 
 export default function PatientCodeDialog({
   open,
+  patientName,
   onPatientLoaded,
+  onClose,
 }: {
   open: boolean;
+  patientName?: string;
   onPatientLoaded: (patient: PatientRecord) => void;
+  onClose?: () => void;
 }) {
   const [patientCode, setPatientCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -46,24 +50,35 @@ export default function PatientCodeDialog({
   }
 
   return (
-    <Dialog open={open} fullWidth maxWidth="sm">
-      <DialogTitle>Enter Patient Code</DialogTitle>
+    <Dialog open={open} fullWidth maxWidth="sm" onClose={onClose}>
+      <DialogTitle>
+        {patientName ? `Confirm Code for ${patientName}` : "Enter Patient Code"}
+      </DialogTitle>
       <DialogContent>
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
-            Load patient details from CSV by entering a valid patient code.
+            Load patient details from CSV by entering the last 3 digits of the
+            patient code. e.g. 001, 002, 003
           </Typography>
           {error ? <Alert severity="error">{error}</Alert> : null}
           <TextField
             autoFocus
-            label="Patient Code"
+            label="Patient Code (last 3 digits)"
             value={patientCode}
             onChange={(event) => setPatientCode(event.target.value)}
-            placeholder="P-1001"
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.preventDefault();
+                handleLookup();
+              }
+            }}
+            placeholder="e.g. 001, 002, 003"
+            slotProps={{ htmlInput: { maxLength: 3 } }}
           />
         </Stack>
       </DialogContent>
       <DialogActions>
+        {onClose ? <Button onClick={onClose}>Cancel</Button> : null}
         <Button onClick={handleLookup} variant="contained" disabled={loading}>
           {loading ? "Loading..." : "Load Patient"}
         </Button>

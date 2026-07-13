@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Alert,
   Box,
+  Button,
   Chip,
   Divider,
   IconButton,
@@ -17,12 +18,12 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import Image from "next/image";
+import Link from "next/link";
 import type {
   MedicineRecord,
   PatientRecord,
   SessionUser,
 } from "@/types/portal";
-import PatientCodeDialog from "@/components/prescription/patient-code-dialog";
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
 import { formatRxItem, parseRxItems, stringifyRxItems } from "@/lib/rx";
@@ -91,6 +92,7 @@ export default function PrescriptionWorkspace({
   hospital,
   today,
   now,
+  initialPatient,
 }: {
   session: SessionUser;
   medicines: MedicineRecord[];
@@ -102,14 +104,14 @@ export default function PrescriptionWorkspace({
   };
   today: string;
   now: string;
+  initialPatient: PatientRecord;
 }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
 
-  const [patient, setPatient] = useState<PatientRecord | null>(null);
-  const [lookupOpen, setLookupOpen] = useState(true);
+  const [patient, setPatient] = useState<PatientRecord | null>(initialPatient);
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [rxEditorOpen, setRxEditorOpen] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -174,14 +176,21 @@ export default function PrescriptionWorkspace({
 
   return (
     <Stack spacing={2.5}>
-      <Alert severity="info">{infoText}</Alert>
-      <PatientCodeDialog
-        open={lookupOpen}
-        onPatientLoaded={(loaded) => {
-          setPatient(loaded);
-          setLookupOpen(false);
-        }}
-      />
+      <Alert
+        severity="info"
+        action={
+          <Button
+            component={Link}
+            href="/portal/patients"
+            color="inherit"
+            size="small"
+          >
+            Change Patient
+          </Button>
+        }
+      >
+        {infoText}
+      </Alert>
 
       <Paper sx={{ p: 2.5, border: "1px solid #d8e2eb" }}>
         <Box

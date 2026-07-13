@@ -40,7 +40,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.replace("/portal/prescription");
+    router.replace("/portal/patients");
     router.refresh();
   }
 

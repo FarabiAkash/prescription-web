@@ -104,9 +104,26 @@ export async function findPatientByCode(
 ): Promise<PatientRecord | null> {
   const patients = await getPatients();
   const normalized = patientCode.trim().toUpperCase();
+
+  const exactMatch = patients.find(
+    (patient) => patient.patientCode.trim().toUpperCase() === normalized,
+  );
+  if (exactMatch) {
+    return exactMatch;
+  }
+
+  // Support entering just the last few digits of the patient code.
+  const suffixMatch = patients.find((patient) =>
+    patient.patientCode.trim().toUpperCase().endsWith(normalized),
+  );
+  if (suffixMatch) {
+    return suffixMatch;
+  }
+
+  // Demo fallback: any unrecognized code loads the first demo patient.
   return (
     patients.find(
-      (patient) => patient.patientCode.trim().toUpperCase() === normalized,
+      (patient) => patient.patientCode.trim().toUpperCase() === "P-1001",
     ) ?? null
   );
 }

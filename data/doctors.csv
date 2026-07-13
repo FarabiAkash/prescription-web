@@ -2,5 +2,5 @@ Username,Password,Doctor Name,Designation,Qualifications,Specialization,Hospital
 sarwar,1234,"Prof. Dr. Sarwar Alam","Professor & Consultant","MBBS, DO, FCPS (EYE)","Cornea & Cataract Surgeon","Cornea & Anterior Segment",BMDC-11221
 salam,1234,"Dr. Abdus Salam","Senior Consultant & Director","MBBS, DO","Cataract, Cornea & Anterior Segment Specialist","Cornea Department",BMDC-20983
 muntakim,1234,"Assoc. Prof. Dr. Muntakim Shahid","Associate Professor & Consultant","MBBS, DO, FCPS","General Ophthalmology & Cataract Specialist","Cataract Department",BMDC-31874
-kamal,1234,"Prof. Dr. ASM Kamal Uddin","Professor & Specialist","MBBS, FCPS (EYE)","Phaco, Glaucoma & Medical Retina Specialist","Glaucoma & Retina",BMDC-14577
-yusuf,1234,"Dr. Yusuf Jamal Khan","Consultant","MBBS, DO","Eye Specialist & Phaco Surgeon","Ophthalmology / POPD",BMDC-29210
+doctor1,1234,"Prof. Dr. ASM Kamal Uddin","Professor & Specialist","MBBS, FCPS (EYE)","Phaco, Glaucoma & Medical Retina Specialist","Glaucoma & Retina",BMDC-14577
+doctor2,1234,"Dr. Yusuf Jamal Khan","Consultant","MBBS, DO","Eye Specialist & Phaco Surgeon","Ophthalmology / POPD",BMDC-29210

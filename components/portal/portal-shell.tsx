@@ -12,13 +12,14 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { PropsWithChildren } from "react";
 import type { SessionUser, SidebarModule } from "@/types/portal";
 
 const SIDEBAR_WIDTH = 250;
 
 const MODULES: Array<{ label: SidebarModule; path: string }> = [
+  { label: "Patients", path: "/portal/patients" },
   { label: "Prescription", path: "/portal/prescription" },
   { label: "Complaints", path: "/portal/prescription?tab=complaints" },
   { label: "Vision", path: "/portal/prescription?tab=vision" },
@@ -34,12 +35,28 @@ export default function PortalShell({
 }: PropsWithChildren<{ session: SessionUser }>) {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [busy, setBusy] = useState(false);
 
   const active = useMemo(() => {
     return MODULES.find((item) => pathname.startsWith(item.path.split("?")[0]))
       ?.label;
   }, [pathname]);
+
+  function handleNavigate(path: string) {
+    const [base, query] = path.split("?");
+    if (base === "/portal/prescription") {
+      const params = new URLSearchParams(query ?? "");
+      const code = searchParams.get("code");
+      if (code && !params.has("code")) {
+        params.set("code", code);
+      }
+      const qs = params.toString();
+      router.push(qs ? `${base}?${qs}` : base);
+      return;
+    }
+    router.push(path);
+  }
 
   async function handleLogout() {
     setBusy(true);
@@ -102,7 +119,7 @@ export default function PortalShell({
             <ListItemButton
               key={item.label}
               selected={active === item.label}
-              onClick={() => router.push(item.path)}
+              onClick={() => handleNavigate(item.path)}
               sx={{ borderRadius: 2, mb: 0.5 }}
             >
               <ListItemText
@@ -123,9 +140,9 @@ export default function PortalShell({
         component="main"
         sx={{
           flexGrow: 1,
-          ml: { sm: `${SIDEBAR_WIDTH}px` },
           mt: 8,
           p: { xs: 2, sm: 3 },
+          minWidth: 0,
         }}
       >
         {children}
