@@ -16,6 +16,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PrintIcon from "@mui/icons-material/Print";
 import Image from "next/image";
+import { alpha } from "@mui/material/styles";
+import type { Theme } from "@mui/material/styles";
 import type {
   DiagnosisRecord,
   MedicineRecord,
@@ -30,6 +32,19 @@ import RichTextContent from "@/components/prescription/rich-text-content";
 import { isRichTextEmpty } from "@/lib/sanitize-html";
 import { parseRxItems, stringifyRxItems } from "@/lib/rx";
 import { parseDiagnosisItems, stringifyDiagnosisItems } from "@/lib/diagnosis";
+
+function actionIconSx(color: "primary" | "success" | "info") {
+  return (theme: Theme) => ({
+    p: 0.3,
+    border: "1px solid",
+    borderColor: theme.palette[color].main,
+    backgroundColor: alpha(theme.palette[color].main, 0.12),
+    transition: "background-color 0.15s ease",
+    "&:hover": {
+      backgroundColor: alpha(theme.palette[color].main, 0.26),
+    },
+  });
+}
 
 const EYE_ABBREVIATIONS: Record<string, string> = {
   Left: "LE",
@@ -371,7 +386,9 @@ export default function PrescriptionWorkspace({
                           <IconButton
                             size="small"
                             color={hasSummary ? "primary" : "success"}
-                            sx={{ p: 0.25 }}
+                            sx={actionIconSx(
+                              hasSummary ? "primary" : "success",
+                            )}
                             onClick={() =>
                               setEditor({
                                 key: section.summaryKey as SectionKey,
@@ -381,9 +398,9 @@ export default function PrescriptionWorkspace({
                             }
                           >
                             {hasSummary ? (
-                              <EditIcon sx={{ fontSize: 18 }} />
+                              <EditIcon sx={{ fontSize: 16 }} />
                             ) : (
-                              <AddIcon sx={{ fontSize: 18 }} />
+                              <AddIcon sx={{ fontSize: 16 }} />
                             )}
                           </IconButton>
                         </Tooltip>
@@ -391,7 +408,7 @@ export default function PrescriptionWorkspace({
                           <IconButton
                             size="small"
                             color="info"
-                            sx={{ p: 0.25 }}
+                            sx={actionIconSx("info")}
                             onClick={() =>
                               setEditor({
                                 key: section.detailKey as SectionKey,
@@ -400,7 +417,7 @@ export default function PrescriptionWorkspace({
                               })
                             }
                           >
-                            <VisibilityIcon sx={{ fontSize: 18 }} />
+                            <VisibilityIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -436,13 +453,15 @@ export default function PrescriptionWorkspace({
                   <IconButton
                     size="small"
                     color={diagnosisItems.length > 0 ? "primary" : "success"}
-                    sx={{ p: 0.25 }}
+                    sx={actionIconSx(
+                      diagnosisItems.length > 0 ? "primary" : "success",
+                    )}
                     onClick={() => setDiagnosisEditorOpen(true)}
                   >
                     {diagnosisItems.length > 0 ? (
-                      <EditIcon sx={{ fontSize: 18 }} />
+                      <EditIcon sx={{ fontSize: 16 }} />
                     ) : (
-                      <AddIcon sx={{ fontSize: 18 }} />
+                      <AddIcon sx={{ fontSize: 16 }} />
                     )}
                   </IconButton>
                 </Box>
@@ -502,7 +521,7 @@ export default function PrescriptionWorkspace({
                       <IconButton
                         size="small"
                         color={hasContent ? "primary" : "success"}
-                        sx={{ p: 0.25 }}
+                        sx={actionIconSx(hasContent ? "primary" : "success")}
                         onClick={() =>
                           setEditor({
                             key: key as SectionKey,
@@ -512,9 +531,9 @@ export default function PrescriptionWorkspace({
                         }
                       >
                         {hasContent ? (
-                          <EditIcon sx={{ fontSize: 18 }} />
+                          <EditIcon sx={{ fontSize: 16 }} />
                         ) : (
-                          <AddIcon sx={{ fontSize: 18 }} />
+                          <AddIcon sx={{ fontSize: 16 }} />
                         )}
                       </IconButton>
                     </Box>
@@ -565,13 +584,15 @@ export default function PrescriptionWorkspace({
                   <IconButton
                     size="small"
                     color={rxItems.length > 0 ? "primary" : "success"}
-                    sx={{ p: 0.25 }}
+                    sx={actionIconSx(
+                      rxItems.length > 0 ? "primary" : "success",
+                    )}
                     onClick={() => setRxEditorOpen(true)}
                   >
                     {rxItems.length > 0 ? (
-                      <EditIcon sx={{ fontSize: 18 }} />
+                      <EditIcon sx={{ fontSize: 16 }} />
                     ) : (
-                      <AddIcon sx={{ fontSize: 18 }} />
+                      <AddIcon sx={{ fontSize: 16 }} />
                     )}
                   </IconButton>
                 </Box>
@@ -641,9 +662,9 @@ export default function PrescriptionWorkspace({
                 }}
               >
                 {[
-                  ["Glass Prediction", "glassPrediction"],
-                  ["Advice", "advice"],
-                  ["Follow Up", "followUp"],
+                  ["Glass Prediction:", "glassPrediction"],
+                  ["Advice:", "advice"],
+                  ["Follow Up:", "followUp"],
                 ].map(([label, key]) => {
                   const content = String(
                     patient?.[key as keyof PatientRecord] ?? "",
@@ -667,7 +688,7 @@ export default function PrescriptionWorkspace({
                         <IconButton
                           size="small"
                           color={hasContent ? "primary" : "success"}
-                          sx={{ p: 0.25 }}
+                          sx={actionIconSx(hasContent ? "primary" : "success")}
                           onClick={() =>
                             setEditor({
                               key: key as SectionKey,
@@ -677,9 +698,9 @@ export default function PrescriptionWorkspace({
                           }
                         >
                           {hasContent ? (
-                            <EditIcon sx={{ fontSize: 18 }} />
+                            <EditIcon sx={{ fontSize: 16 }} />
                           ) : (
-                            <AddIcon sx={{ fontSize: 18 }} />
+                            <AddIcon sx={{ fontSize: 16 }} />
                           )}
                         </IconButton>
                       </Box>
