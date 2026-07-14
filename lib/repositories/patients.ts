@@ -45,6 +45,11 @@ type PatientsCsvRow = {
   "Glass Prediction": string;
   Advice: string;
   "Follow Up": string;
+  "UCVA Right": string;
+  "UCVA Left": string;
+  "IOP Right": string;
+  "IOP Left": string;
+  "History Tag": string;
 };
 
 const PATIENT_HEADERS: Array<keyof PatientsCsvRow> = [
@@ -68,6 +73,11 @@ const PATIENT_HEADERS: Array<keyof PatientsCsvRow> = [
   "Glass Prediction",
   "Advice",
   "Follow Up",
+  "UCVA Right",
+  "UCVA Left",
+  "IOP Right",
+  "IOP Left",
+  "History Tag",
 ];
 
 function mapPatient(row: PatientsCsvRow): PatientRecord {
@@ -92,6 +102,11 @@ function mapPatient(row: PatientsCsvRow): PatientRecord {
     glassPrediction: row["Glass Prediction"],
     advice: row.Advice,
     followUp: row["Follow Up"],
+    ucvaRight: row["UCVA Right"],
+    ucvaLeft: row["UCVA Left"],
+    iopRight: row["IOP Right"],
+    iopLeft: row["IOP Left"],
+    historyTag: row["History Tag"],
   };
 }
 
@@ -117,6 +132,11 @@ function toCsvRow(patient: PatientRecord): PatientsCsvRow {
     "Glass Prediction": patient.glassPrediction,
     Advice: patient.advice,
     "Follow Up": patient.followUp,
+    "UCVA Right": patient.ucvaRight,
+    "UCVA Left": patient.ucvaLeft,
+    "IOP Right": patient.iopRight,
+    "IOP Left": patient.iopLeft,
+    "History Tag": patient.historyTag,
   };
 }
 

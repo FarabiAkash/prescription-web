@@ -41,6 +41,11 @@ export type PatientRecord = {
   glassPrediction: string;
   advice: string;
   followUp: string;
+  ucvaRight: string;
+  ucvaLeft: string;
+  iopRight: string;
+  iopLeft: string;
+  historyTag: string;
 };
 
 export type HospitalRecord = {

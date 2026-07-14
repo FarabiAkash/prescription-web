@@ -387,6 +387,166 @@ export default function PrescriptionWorkspace({
             </Typography>
           </Box>
 
+          <Box
+            sx={{
+              mx: { xs: -2, sm: -3, md: -4 },
+              mt: { xs: -1.25, md: -1.75 },
+              mb: 0.5,
+              px: { xs: 2, sm: 3, md: 4 },
+              py: 0.5,
+              backgroundColor: "#ffe699",
+              display: "grid",
+              gridTemplateColumns: "1fr auto 1fr",
+              alignItems: "center",
+              gap: 1,
+              "@media print": { display: "grid" },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: 0.75,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                UCVA:
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  border: "1.5px solid rgba(4, 102, 156, 0.45)",
+                  overflow: "hidden",
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(4, 102, 156, 0.14)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 13.5,
+                      color: "primary.dark",
+                    }}
+                  >
+                    {patient?.ucvaRight || "-"}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(4, 102, 156, 0.14)",
+                    borderLeft: "1.5px solid rgba(4, 102, 156, 0.45)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 13.5,
+                      color: "primary.dark",
+                    }}
+                  >
+                    {patient?.ucvaLeft || "-"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 0.75,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                IOP:
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  border: "1.5px solid rgba(0, 0, 0, 0.2)",
+                  overflow: "hidden",
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 13.5 }}
+                  >
+                    {patient?.iopRight || "-"}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
+                    borderLeft: "1.5px solid rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 13.5 }}
+                  >
+                    {patient?.iopLeft || "-"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 0.5,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                History:
+              </Typography>
+              <Box
+                sx={{
+                  px: 0.75,
+                  py: 0.1,
+                  borderRadius: 0,
+                  backgroundColor: "rgba(255, 255, 255, 0.7)",
+                  border: "1.5px solid rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, fontSize: 13.5 }}
+                >
+                  {patient?.historyTag || "-"}
+                </Typography>
+              </Box>
+            </Box>
+          </Box>
+
           <Divider />
 
           <Box

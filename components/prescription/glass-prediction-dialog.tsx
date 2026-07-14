@@ -129,7 +129,7 @@ export default function GlassPredictionDialog({
           </Table>
 
           <Typography variant="body2" color="text.secondary">
-            Leave a row blank if it doesn't apply.
+            Leave a row blank if it doesn&apos;t apply.
           </Typography>
 
           <TextField
