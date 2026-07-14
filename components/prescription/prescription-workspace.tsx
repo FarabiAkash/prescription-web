@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Box,
@@ -158,6 +158,8 @@ export default function PrescriptionWorkspace({
   const [diagnosisEditorOpen, setDiagnosisEditorOpen] = useState(false);
   const [glassPredictionEditorOpen, setGlassPredictionEditorOpen] =
     useState(false);
+  const vitalsBarRef = useRef<HTMLDivElement>(null);
+  const [vitalsBarScale, setVitalsBarScale] = useState(1);
 
   const rxItems = useMemo(() => parseRxItems(patient?.rx ?? ""), [patient?.rx]);
   const diagnosisItems = useMemo(
@@ -168,6 +170,48 @@ export default function PrescriptionWorkspace({
     () => parseGlassPrediction(patient?.glassPrediction ?? ""),
     [patient?.glassPrediction],
   );
+
+  useEffect(() => {
+    const el = vitalsBarRef.current;
+    if (!el) {
+      return;
+    }
+
+    function measure() {
+      if (!el) {
+        return;
+      }
+      const available = el.parentElement?.clientWidth ?? el.clientWidth;
+      if (!available) {
+        return;
+      }
+      // Measure the row's natural (unscaled) width so we can compute how
+      // much it needs to shrink to avoid causing horizontal overflow.
+      const previousTransform = el.style.transform;
+      el.style.transform = "none";
+      const natural = el.scrollWidth;
+      el.style.transform = previousTransform;
+
+      const nextScale =
+        natural > available ? Math.max(available / natural, 0.6) : 1;
+      setVitalsBarScale((current) =>
+        Math.abs(current - nextScale) > 0.01 ? nextScale : current,
+      );
+    }
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (el.parentElement) {
+      observer.observe(el.parentElement);
+    }
+    return () => observer.disconnect();
+  }, [
+    patient?.ucvaRight,
+    patient?.ucvaLeft,
+    patient?.iopRight,
+    patient?.iopLeft,
+    patient?.historyTag,
+  ]);
 
   const tabMapping = tab ? TAB_TO_SECTION[tab] : undefined;
   const activeEditor: EditorState | null =
@@ -347,7 +391,7 @@ export default function PrescriptionWorkspace({
               },
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 16 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 14 }}>
               Name: {patient?.patientName ?? "-"}
             </Typography>
             <Box
@@ -360,25 +404,25 @@ export default function PrescriptionWorkspace({
             >
               <Typography
                 variant="body2"
-                sx={{ fontWeight: 700, fontSize: 16 }}
+                sx={{ fontWeight: 700, fontSize: 14 }}
               >
                 UIN: {patient?.patientCode ?? "-"}
               </Typography>
-              <Typography variant="body2" sx={{ fontSize: 16 }}>
+              <Typography variant="body2" sx={{ fontSize: 14 }}>
                 <Box component="span" sx={{ fontWeight: 700 }}>
                   MRN:
                 </Box>{" "}
                 {patient?.mrn ?? "-"}
               </Typography>
             </Box>
-            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 16 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 14 }}>
               {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
             </Typography>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 700,
-                fontSize: 16,
+                fontSize: 14,
                 textAlign: { xs: "left", md: "right" },
                 "@media print": { textAlign: "right" },
               }}
@@ -388,6 +432,7 @@ export default function PrescriptionWorkspace({
           </Box>
 
           <Box
+            ref={vitalsBarRef}
             sx={{
               mx: { xs: -2, sm: -3, md: -4 },
               mt: { xs: -1.25, md: -1.75 },
@@ -399,7 +444,9 @@ export default function PrescriptionWorkspace({
               gridTemplateColumns: "1fr auto 1fr",
               alignItems: "center",
               gap: 1,
-              "@media print": { display: "grid" },
+              transform: `scale(${vitalsBarScale})`,
+              transformOrigin: "center",
+              "@media print": { display: "grid", transform: "none" },
             }}
           >
             <Box
@@ -1056,18 +1103,19 @@ export default function PrescriptionWorkspace({
                     alignItems: "center",
                     textAlign: "center",
                     gap: 0.1,
+                    transform: "translateX(-8%)",
                   }}
                 >
                   <Typography
                     variant="caption"
-                    sx={{ fontWeight: 700, fontSize: 14 }}
+                    sx={{ fontWeight: 700, fontSize: 12 }}
                   >
                     {session.doctorName}
                   </Typography>
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ fontSize: 13 }}
+                    sx={{ fontSize: 11 }}
                   >
                     {session.designation} | Reg: {session.registrationNumber} |{" "}
                     {session.specialization}
@@ -1075,7 +1123,7 @@ export default function PrescriptionWorkspace({
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ fontSize: 13 }}
+                    sx={{ fontSize: 11 }}
                   >
                     {today} at {now}
                   </Typography>
