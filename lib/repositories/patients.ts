@@ -26,6 +26,7 @@ function applyOverrides(patients: PatientRecord[]): PatientRecord[] {
 
 type PatientsCsvRow = {
   "Patient Code": string;
+  MRN: string;
   "Patient Name": string;
   Sex: string;
   Age: string;
@@ -48,6 +49,7 @@ type PatientsCsvRow = {
 
 const PATIENT_HEADERS: Array<keyof PatientsCsvRow> = [
   "Patient Code",
+  "MRN",
   "Patient Name",
   "Sex",
   "Age",
@@ -71,6 +73,7 @@ const PATIENT_HEADERS: Array<keyof PatientsCsvRow> = [
 function mapPatient(row: PatientsCsvRow): PatientRecord {
   return {
     patientCode: row["Patient Code"],
+    mrn: row.MRN,
     patientName: row["Patient Name"],
     sex: row.Sex,
     age: row.Age,
@@ -95,6 +98,7 @@ function mapPatient(row: PatientsCsvRow): PatientRecord {
 function toCsvRow(patient: PatientRecord): PatientsCsvRow {
   return {
     "Patient Code": patient.patientCode,
+    MRN: patient.mrn,
     "Patient Name": patient.patientName,
     Sex: patient.sex,
     Age: patient.age,
@@ -143,11 +147,7 @@ export async function findPatientByCode(
   }
 
   // Demo fallback: any unrecognized code loads the first demo patient.
-  return (
-    patients.find(
-      (patient) => patient.patientCode.trim().toUpperCase() === "P-1001",
-    ) ?? null
-  );
+  return patients[0] ?? null;
 }
 
 export async function updatePatientRecord(

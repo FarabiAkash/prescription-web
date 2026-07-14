@@ -45,9 +45,9 @@ npm run lint    # run ESLint
 
 Log in with any of the demo doctor accounts shown on the login page's quick-login buttons (all use password `1234`), then open the **Patients** page. Three demo patients are included, each set up to showcase a different part of the app:
 
-- **P-1001 (Md. Rahim Uddin)** — a mostly complete chart with multiple tagged diagnoses and a full Rx list, but a few sections intentionally left empty.
-- **P-1002 (Sharmin Akter)** — a minimal chart (only Complaints, Vision and History filled in) to show the empty-state of every other section.
-- **P-1003 (Abdul Karim)** — a fully completed chart across every section, useful for reviewing the complete prescription sheet and print output.
+- **0000-506025 (Md. Rahim Uddin)** — a mostly complete chart with multiple tagged diagnoses and a full Rx list, but a few sections intentionally left empty.
+- **0000-506026 (Sharmin Akter)** — a minimal chart (only Complaints, Vision and History filled in) to show the empty-state of every other section.
+- **0000-506027 (Abdul Karim)** — a fully completed chart across every section, useful for reviewing the complete prescription sheet and print output.
 
 The Patients page itself includes an in-app guide describing the workflow and each demo patient in more detail.
 

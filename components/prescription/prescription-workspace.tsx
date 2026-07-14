@@ -281,14 +281,60 @@ export default function PrescriptionWorkspace({
               color="text.secondary"
               sx={{ fontSize: 13 }}
             >
-              {hospital.address} | {hospital.contact} | {hospital.website}
+              {hospital.address} | {hospital.contact} |{" "}
+              <Box
+                component="a"
+                href={hospital.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: "primary.main" }}
+              >
+                {hospital.website}
+              </Box>
             </Typography>
-            <Typography
-              variant="h6"
-              sx={{ mt: 0.25, fontWeight: 700, fontSize: 24 }}
+            <Box
+              sx={{
+                position: "relative",
+                alignSelf: "stretch",
+                display: "flex",
+                justifyContent: "center",
+                mt: 0.25,
+              }}
             >
-              Prescription Sheet
-            </Typography>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 24 }}>
+                Prescription Sheet
+              </Typography>
+              <Box
+                aria-hidden
+                sx={{
+                  position: "absolute",
+                  right: 3,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 0.25,
+                  "@media print": { display: "flex" },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 26,
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, #111 0px, #111 2px, transparent 2px, transparent 4px, #111 4px, #111 5px, transparent 5px, transparent 9px, #111 9px, #111 12px, transparent 12px, transparent 14px, #111 14px, #111 15px, transparent 15px, transparent 18px)",
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: 8, letterSpacing: 1 }}
+                >
+                  0000 506025
+                </Typography>
+              </Box>
+            </Box>
           </Box>
 
           <Box
@@ -304,19 +350,29 @@ export default function PrescriptionWorkspace({
             <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 16 }}>
               Name: {patient?.patientName ?? "-"}
             </Typography>
-            <Typography
-              variant="body2"
+            <Box
               sx={{
-                fontWeight: 700,
-                fontSize: 16,
-                textAlign: { xs: "left", md: "right" },
-                "@media print": { textAlign: "right" },
+                display: "flex",
+                justifyContent: { xs: "flex-start", md: "flex-end" },
+                "@media print": { justifyContent: "flex-end" },
+                gap: 2,
               }}
             >
-              ID: {patient?.patientCode ?? "-"}
-            </Typography>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, fontSize: 16 }}
+              >
+                UIN: {patient?.patientCode ?? "-"}
+              </Typography>
+              <Typography variant="body2" sx={{ fontSize: 16 }}>
+                <Box component="span" sx={{ fontWeight: 700 }}>
+                  MRN:
+                </Box>{" "}
+                {patient?.mrn ?? "-"}
+              </Typography>
+            </Box>
             <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 16 }}>
-              Details: {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
+              {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
             </Typography>
             <Typography
               variant="body2"

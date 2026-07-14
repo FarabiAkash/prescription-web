@@ -92,7 +92,7 @@ export default function PatientsList({
 
           <Typography variant="h6">Demo Patient Data Guide</Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>P-1001 (Md. Rahim Uddin)</strong> is set up as a mostly
+            <strong>0000-506025 (Md. Rahim Uddin)</strong> is set up as a mostly
             complete chart to demonstrate a typical multi-diagnosis eye visit:
             Complaints, Vision and History are filled in, but Refraction,
             Investigation and Plan are intentionally left empty so you can see
@@ -103,7 +103,7 @@ export default function PatientsList({
             tablet, useful for exercising the full medicine picker.
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>P-1002 (Sharmin Akter)</strong> is deliberately minimal
+            <strong>0000-506026 (Sharmin Akter)</strong> is deliberately minimal
             &mdash; only Complaints, Vision and History are populated, and every
             other section (Refraction, Diagnosis, Investigation, Plan, Rx, Glass
             Prediction, Advice, Follow Up) is empty. Use this patient to confirm
@@ -111,7 +111,7 @@ export default function PatientsList({
             completely blank chart works as expected.
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            <strong>P-1003 (Abdul Karim)</strong> is fully filled in across
+            <strong>0000-506027 (Abdul Karim)</strong> is fully filled in across
             every field to represent a pre-operative cataract case: it has
             Complaints, Vision, Refraction and History details, two tagged
             Diagnosis entries (Cataract and Diabetic Retinopathy), a structured

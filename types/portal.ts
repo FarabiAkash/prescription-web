@@ -22,6 +22,7 @@ export type DoctorRecord = {
 
 export type PatientRecord = {
   patientCode: string;
+  mrn: string;
   patientName: string;
   sex: string;
   age: string;
