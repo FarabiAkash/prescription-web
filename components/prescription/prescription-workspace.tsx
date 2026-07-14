@@ -240,14 +240,21 @@ export default function PrescriptionWorkspace({
                 width={40}
                 height={40}
               />
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 24 }}>
                 {hospital.hospitalName}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.secondary">
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontSize: 13 }}
+            >
               {hospital.address} | {hospital.contact} | {hospital.website}
             </Typography>
-            <Typography variant="h6" sx={{ mt: 0.25, fontWeight: 700 }}>
+            <Typography
+              variant="h6"
+              sx={{ mt: 0.25, fontWeight: 700, fontSize: 24 }}
+            >
               Prescription Sheet
             </Typography>
           </Box>
@@ -262,26 +269,28 @@ export default function PrescriptionWorkspace({
               },
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 16 }}>
               Name: {patient?.patientName ?? "-"}
             </Typography>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 700,
+                fontSize: 16,
                 textAlign: { xs: "left", md: "right" },
                 "@media print": { textAlign: "right" },
               }}
             >
               ID: {patient?.patientCode ?? "-"}
             </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 16 }}>
               Details: {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
             </Typography>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 700,
+                fontSize: 16,
                 textAlign: { xs: "left", md: "right" },
                 "@media print": { textAlign: "right" },
               }}
@@ -328,7 +337,11 @@ export default function PrescriptionWorkspace({
                       >
                         <Typography
                           variant="caption"
-                          sx={{ fontWeight: 700, whiteSpace: "nowrap" }}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: 14,
+                            whiteSpace: "nowrap",
+                          }}
                         >
                           {section.title}
                           {isHistory ? ":" : ""}
@@ -338,7 +351,7 @@ export default function PrescriptionWorkspace({
                             html={summary}
                             sx={{
                               display: "inline",
-                              fontSize: 11,
+                              fontSize: 13,
                               color: "text.secondary",
                               "& ul": {
                                 display: "inline",
@@ -368,9 +381,9 @@ export default function PrescriptionWorkspace({
                             }
                           >
                             {hasSummary ? (
-                              <EditIcon sx={{ fontSize: 14 }} />
+                              <EditIcon sx={{ fontSize: 18 }} />
                             ) : (
-                              <AddIcon sx={{ fontSize: 14 }} />
+                              <AddIcon sx={{ fontSize: 18 }} />
                             )}
                           </IconButton>
                         </Tooltip>
@@ -387,7 +400,7 @@ export default function PrescriptionWorkspace({
                               })
                             }
                           >
-                            <VisibilityIcon sx={{ fontSize: 14 }} />
+                            <VisibilityIcon sx={{ fontSize: 18 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -397,7 +410,7 @@ export default function PrescriptionWorkspace({
                         html={summary}
                         sx={{
                           mt: 0.25,
-                          fontSize: 11,
+                          fontSize: 13,
                           color: "text.secondary",
                         }}
                       />
@@ -414,7 +427,10 @@ export default function PrescriptionWorkspace({
                     gap: 0.5,
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 14 }}
+                  >
                     Diagnosis:{" "}
                   </Typography>
                   <IconButton
@@ -424,9 +440,9 @@ export default function PrescriptionWorkspace({
                     onClick={() => setDiagnosisEditorOpen(true)}
                   >
                     {diagnosisItems.length > 0 ? (
-                      <EditIcon sx={{ fontSize: 14 }} />
+                      <EditIcon sx={{ fontSize: 18 }} />
                     ) : (
-                      <AddIcon sx={{ fontSize: 14 }} />
+                      <AddIcon sx={{ fontSize: 18 }} />
                     )}
                   </IconButton>
                 </Box>
@@ -447,7 +463,7 @@ export default function PrescriptionWorkspace({
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontSize: 11 }}
+                          sx={{ fontSize: 13 }}
                         >
                           {item.name}
                           {item.eye
@@ -477,7 +493,10 @@ export default function PrescriptionWorkspace({
                         gap: 0.5,
                       }}
                     >
-                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 700, fontSize: 14 }}
+                      >
                         {label}
                       </Typography>
                       <IconButton
@@ -493,9 +512,9 @@ export default function PrescriptionWorkspace({
                         }
                       >
                         {hasContent ? (
-                          <EditIcon sx={{ fontSize: 14 }} />
+                          <EditIcon sx={{ fontSize: 18 }} />
                         ) : (
-                          <AddIcon sx={{ fontSize: 14 }} />
+                          <AddIcon sx={{ fontSize: 18 }} />
                         )}
                       </IconButton>
                     </Box>
@@ -504,7 +523,7 @@ export default function PrescriptionWorkspace({
                         html={content}
                         sx={{
                           mt: 0.25,
-                          fontSize: 11,
+                          fontSize: 13,
                           color: "text.secondary",
                         }}
                       />
@@ -537,7 +556,10 @@ export default function PrescriptionWorkspace({
                     gap: 0.5,
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 14 }}
+                  >
                     Rx.
                   </Typography>
                   <IconButton
@@ -547,9 +569,9 @@ export default function PrescriptionWorkspace({
                     onClick={() => setRxEditorOpen(true)}
                   >
                     {rxItems.length > 0 ? (
-                      <EditIcon sx={{ fontSize: 14 }} />
+                      <EditIcon sx={{ fontSize: 18 }} />
                     ) : (
-                      <AddIcon sx={{ fontSize: 14 }} />
+                      <AddIcon sx={{ fontSize: 18 }} />
                     )}
                   </IconButton>
                 </Box>
@@ -579,7 +601,7 @@ export default function PrescriptionWorkspace({
                             variant="caption"
                             sx={{
                               fontWeight: 700,
-                              fontSize: 11,
+                              fontSize: 14,
                               display: "block",
                             }}
                           >
@@ -589,7 +611,7 @@ export default function PrescriptionWorkspace({
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ fontSize: 11, display: "block" }}
+                              sx={{ fontSize: 13, display: "block" }}
                             >
                               {usageParts.join(" --------------- ")}
                             </Typography>
@@ -602,7 +624,7 @@ export default function PrescriptionWorkspace({
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ mt: 0.5, display: "block" }}
+                    sx={{ mt: 0.5, display: "block", fontSize: 13 }}
                   >
                     No medicine selected yet.
                   </Typography>
@@ -636,7 +658,10 @@ export default function PrescriptionWorkspace({
                           gap: 0.5,
                         }}
                       >
-                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontWeight: 700, fontSize: 14 }}
+                        >
                           {label}
                         </Typography>
                         <IconButton
@@ -652,9 +677,9 @@ export default function PrescriptionWorkspace({
                           }
                         >
                           {hasContent ? (
-                            <EditIcon sx={{ fontSize: 14 }} />
+                            <EditIcon sx={{ fontSize: 18 }} />
                           ) : (
-                            <AddIcon sx={{ fontSize: 14 }} />
+                            <AddIcon sx={{ fontSize: 18 }} />
                           )}
                         </IconButton>
                       </Box>
@@ -663,7 +688,7 @@ export default function PrescriptionWorkspace({
                           html={content}
                           sx={{
                             mt: 0.25,
-                            fontSize: 11,
+                            fontSize: 13,
                             color: "text.secondary",
                           }}
                         />
@@ -685,14 +710,25 @@ export default function PrescriptionWorkspace({
                     gap: 0.1,
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 14 }}
+                  >
                     {session.doctorName}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontSize: 13 }}
+                  >
                     {session.designation} | Reg: {session.registrationNumber} |{" "}
                     {session.specialization}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontSize: 13 }}
+                  >
                     {today} at {now}
                   </Typography>
                 </Box>
