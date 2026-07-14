@@ -240,7 +240,7 @@ export default function PortalShell({
               <ListItemText
                 primary={
                   <Typography sx={{ fontWeight: 700, fontSize: 14 }}>
-                    Save &amp; Exit to Patients
+                    Back to Patients
                   </Typography>
                 }
               />
