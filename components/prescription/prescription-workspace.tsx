@@ -8,6 +8,11 @@ import {
   IconButton,
   Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -28,10 +33,17 @@ import type {
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
 import DiagnosisPickerDialog from "@/components/prescription/diagnosis-picker-dialog";
+import GlassPredictionDialog from "@/components/prescription/glass-prediction-dialog";
 import RichTextContent from "@/components/prescription/rich-text-content";
 import { isRichTextEmpty } from "@/lib/sanitize-html";
 import { parseRxItems, stringifyRxItems } from "@/lib/rx";
 import { parseDiagnosisItems, stringifyDiagnosisItems } from "@/lib/diagnosis";
+import {
+  parseGlassPrediction,
+  stringifyGlassPrediction,
+  isGlassPredictionEmpty,
+  type GlassRow,
+} from "@/lib/glass-prediction";
 
 function actionIconSx(color: "primary" | "success" | "info") {
   return (theme: Theme) => ({
@@ -67,7 +79,6 @@ type SectionKey =
   | "historyDetail"
   | "investigation"
   | "plan"
-  | "glassPrediction"
   | "advice"
   | "followUp";
 
@@ -145,11 +156,17 @@ export default function PrescriptionWorkspace({
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [rxEditorOpen, setRxEditorOpen] = useState(false);
   const [diagnosisEditorOpen, setDiagnosisEditorOpen] = useState(false);
+  const [glassPredictionEditorOpen, setGlassPredictionEditorOpen] =
+    useState(false);
 
   const rxItems = useMemo(() => parseRxItems(patient?.rx ?? ""), [patient?.rx]);
   const diagnosisItems = useMemo(
     () => parseDiagnosisItems(patient?.diagnosis ?? ""),
     [patient?.diagnosis],
+  );
+  const glassPrediction = useMemo(
+    () => parseGlassPrediction(patient?.glassPrediction ?? ""),
+    [patient?.glassPrediction],
   );
 
   const tabMapping = tab ? TAB_TO_SECTION[tab] : undefined;
@@ -661,8 +678,102 @@ export default function PrescriptionWorkspace({
                   gap: 0.75,
                 }}
               >
+                <Box sx={{ p: 0.75 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: 700, fontSize: 14 }}
+                    >
+                      Glass Prediction:
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      color={
+                        isGlassPredictionEmpty(glassPrediction)
+                          ? "success"
+                          : "primary"
+                      }
+                      sx={actionIconSx(
+                        isGlassPredictionEmpty(glassPrediction)
+                          ? "success"
+                          : "primary",
+                      )}
+                      onClick={() => setGlassPredictionEditorOpen(true)}
+                    >
+                      {isGlassPredictionEmpty(glassPrediction) ? (
+                        <AddIcon sx={{ fontSize: 16 }} />
+                      ) : (
+                        <EditIcon sx={{ fontSize: 16 }} />
+                      )}
+                    </IconButton>
+                  </Box>
+                  <Table
+                    size="small"
+                    sx={{
+                      mt: 0.5,
+                      "& td, & th": {
+                        border: "1px solid",
+                        borderColor: "divider",
+                        p: 0.25,
+                        fontSize: 12,
+                        textAlign: "center",
+                      },
+                      "& th": { fontWeight: 700 },
+                    }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell colSpan={2} />
+                        <TableCell component="th">SPH</TableCell>
+                        <TableCell component="th">CYL</TableCell>
+                        <TableCell component="th">AXIS</TableCell>
+                        <TableCell component="th">V/A</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell rowSpan={2} sx={{ fontWeight: 700 }}>
+                          DIST
+                        </TableCell>
+                        <TableCell>R</TableCell>
+                        {(
+                          ["sph", "cyl", "axis", "va"] as Array<keyof GlassRow>
+                        ).map((field) => (
+                          <TableCell key={field}>
+                            {glassPrediction.dist.right[field] || "-"}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>L</TableCell>
+                        {(
+                          ["sph", "cyl", "axis", "va"] as Array<keyof GlassRow>
+                        ).map((field) => (
+                          <TableCell key={field}>
+                            {glassPrediction.dist.left[field] || "-"}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                  {glassPrediction.notes ? (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block", fontSize: 13 }}
+                    >
+                      {glassPrediction.notes}
+                    </Typography>
+                  ) : null}
+                </Box>
+
                 {[
-                  ["Glass Prediction:", "glassPrediction"],
                   ["Advice:", "advice"],
                   ["Follow Up:", "followUp"],
                 ].map(([label, key]) => {
@@ -796,6 +907,17 @@ export default function PrescriptionWorkspace({
         onSave={async (nextItems) => {
           await saveField("diagnosis", stringifyDiagnosisItems(nextItems));
           closeDiagnosisEditor();
+        }}
+      />
+
+      <GlassPredictionDialog
+        key={`gp-${patient?.patientCode ?? "none"}-${patient?.glassPrediction ?? ""}`}
+        open={glassPredictionEditorOpen}
+        initialValue={glassPrediction}
+        onCancel={() => setGlassPredictionEditorOpen(false)}
+        onSave={async (next) => {
+          await saveField("glassPrediction", stringifyGlassPrediction(next));
+          setGlassPredictionEditorOpen(false);
         }}
       />
     </Stack>
