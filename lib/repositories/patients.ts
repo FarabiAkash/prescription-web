@@ -3,8 +3,30 @@ import { readCsv, writeCsv } from "@/lib/csv/file";
 import { sanitizeRichText } from "@/lib/sanitize-html";
 import type { PatientRecord } from "@/types/portal";
 
+// In-memory cache of saved patient updates. This lets the demo's "Save"
+// actions keep working even when the deployment's filesystem is read-only
+// (e.g. Vercel serverless functions), where writing back to the CSV file is
+// expected to fail. Persists for the lifetime of the current server
+// instance; stored on globalThis so it also survives dev-mode module
+// reloads.
+declare global {
+  var __patientOverrides: Map<string, PatientRecord> | undefined;
+}
+
+const patientOverrides: Map<string, PatientRecord> =
+  globalThis.__patientOverrides ?? new Map<string, PatientRecord>();
+globalThis.__patientOverrides = patientOverrides;
+
+function applyOverrides(patients: PatientRecord[]): PatientRecord[] {
+  return patients.map((patient) => {
+    const normalized = patient.patientCode.trim().toUpperCase();
+    return patientOverrides.get(normalized) ?? patient;
+  });
+}
+
 type PatientsCsvRow = {
   "Patient Code": string;
+  MRN: string;
   "Patient Name": string;
   Sex: string;
   Age: string;
@@ -23,10 +45,16 @@ type PatientsCsvRow = {
   "Glass Prediction": string;
   Advice: string;
   "Follow Up": string;
+  "UCVA Right": string;
+  "UCVA Left": string;
+  "IOP Right": string;
+  "IOP Left": string;
+  "History Tag": string;
 };
 
 const PATIENT_HEADERS: Array<keyof PatientsCsvRow> = [
   "Patient Code",
+  "MRN",
   "Patient Name",
   "Sex",
   "Age",
@@ -45,11 +73,17 @@ const PATIENT_HEADERS: Array<keyof PatientsCsvRow> = [
   "Glass Prediction",
   "Advice",
   "Follow Up",
+  "UCVA Right",
+  "UCVA Left",
+  "IOP Right",
+  "IOP Left",
+  "History Tag",
 ];
 
 function mapPatient(row: PatientsCsvRow): PatientRecord {
   return {
     patientCode: row["Patient Code"],
+    mrn: row.MRN,
     patientName: row["Patient Name"],
     sex: row.Sex,
     age: row.Age,
@@ -68,12 +102,18 @@ function mapPatient(row: PatientsCsvRow): PatientRecord {
     glassPrediction: row["Glass Prediction"],
     advice: row.Advice,
     followUp: row["Follow Up"],
+    ucvaRight: row["UCVA Right"],
+    ucvaLeft: row["UCVA Left"],
+    iopRight: row["IOP Right"],
+    iopLeft: row["IOP Left"],
+    historyTag: row["History Tag"],
   };
 }
 
 function toCsvRow(patient: PatientRecord): PatientsCsvRow {
   return {
     "Patient Code": patient.patientCode,
+    MRN: patient.mrn,
     "Patient Name": patient.patientName,
     Sex: patient.sex,
     Age: patient.age,
@@ -92,12 +132,17 @@ function toCsvRow(patient: PatientRecord): PatientsCsvRow {
     "Glass Prediction": patient.glassPrediction,
     Advice: patient.advice,
     "Follow Up": patient.followUp,
+    "UCVA Right": patient.ucvaRight,
+    "UCVA Left": patient.ucvaLeft,
+    "IOP Right": patient.iopRight,
+    "IOP Left": patient.iopLeft,
+    "History Tag": patient.historyTag,
   };
 }
 
 export async function getPatients(): Promise<PatientRecord[]> {
   const rows = await readCsv<PatientsCsvRow>(DATA_FILES.patients);
-  return rows.map(mapPatient);
+  return applyOverrides(rows.map(mapPatient));
 }
 
 export async function findPatientByCode(
@@ -122,28 +167,23 @@ export async function findPatientByCode(
   }
 
   // Demo fallback: any unrecognized code loads the first demo patient.
-  return (
-    patients.find(
-      (patient) => patient.patientCode.trim().toUpperCase() === "P-1001",
-    ) ?? null
-  );
+  return patients[0] ?? null;
 }
 
 export async function updatePatientRecord(
   patientCode: string,
   updates: Partial<PatientRecord>,
 ): Promise<PatientRecord | null> {
-  const rows = await readCsv<PatientsCsvRow>(DATA_FILES.patients);
+  const patients = await getPatients();
   const normalized = patientCode.trim().toUpperCase();
-  const index = rows.findIndex(
-    (row) => row["Patient Code"].trim().toUpperCase() === normalized,
+  const current = patients.find(
+    (patient) => patient.patientCode.trim().toUpperCase() === normalized,
   );
 
-  if (index === -1) {
+  if (!current) {
     return null;
   }
 
-  const current = mapPatient(rows[index]);
   const sanitizedUpdates = Object.fromEntries(
     Object.entries(updates).map(([field, fieldValue]) => [
       field,
@@ -157,12 +197,34 @@ export async function updatePatientRecord(
     ...sanitizedUpdates,
   } satisfies PatientRecord;
 
-  rows[index] = toCsvRow(merged);
-  await writeCsv(
-    DATA_FILES.patients,
-    rows,
-    PATIENT_HEADERS as unknown as string[],
-  );
+  // Always keep the in-memory override up to date first, so the demo keeps
+  // working even in read-only deployments (e.g. Vercel serverless) where the
+  // CSV write below is expected to fail.
+  patientOverrides.set(normalized, merged);
+
+  // Best-effort: persist back to the CSV file too. This succeeds locally / in
+  // any environment with a writable filesystem, and is safely ignored
+  // elsewhere since the in-memory override above already keeps things
+  // working for the current server instance.
+  try {
+    const rows = await readCsv<PatientsCsvRow>(DATA_FILES.patients);
+    const index = rows.findIndex(
+      (row) => row["Patient Code"].trim().toUpperCase() === normalized,
+    );
+    if (index !== -1) {
+      rows[index] = toCsvRow(merged);
+      await writeCsv(
+        DATA_FILES.patients,
+        rows,
+        PATIENT_HEADERS as unknown as string[],
+      );
+    }
+  } catch (error) {
+    console.warn(
+      "Unable to persist patient update to CSV; keeping in-memory only.",
+      error,
+    );
+  }
 
   return merged;
 }

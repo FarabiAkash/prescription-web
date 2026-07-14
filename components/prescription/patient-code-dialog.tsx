@@ -84,7 +84,7 @@ export default function PatientCodeDialog({
         <Stack spacing={2} sx={{ mt: 1 }}>
           <Typography variant="body2" color="text.secondary">
             Load patient details from the demo records by entering the last 3
-            digits of the patient code. e.g. 001, 002, 003
+            digits of the patient code. e.g. 025, 026, 027
           </Typography>
           {error ? <Alert severity="error">{error}</Alert> : null}
           <TextField

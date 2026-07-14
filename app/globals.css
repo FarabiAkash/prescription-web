@@ -27,7 +27,8 @@ body {
   aspect-ratio: 16 / 9;
   margin-left: auto;
   margin-right: auto;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   box-shadow:
     0 1px 3px rgba(15, 23, 42, 0.08),
     0 8px 24px rgba(15, 23, 42, 0.08);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   Box,
@@ -8,6 +8,11 @@ import {
   IconButton,
   Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -16,6 +21,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import PrintIcon from "@mui/icons-material/Print";
 import Image from "next/image";
+import { alpha } from "@mui/material/styles";
+import type { Theme } from "@mui/material/styles";
 import type {
   DiagnosisRecord,
   MedicineRecord,
@@ -26,10 +33,30 @@ import type {
 import SectionEditorDialog from "@/components/prescription/section-editor-dialog";
 import MedicineEditorDialog from "@/components/prescription/medicine-editor-dialog";
 import DiagnosisPickerDialog from "@/components/prescription/diagnosis-picker-dialog";
+import GlassPredictionDialog from "@/components/prescription/glass-prediction-dialog";
 import RichTextContent from "@/components/prescription/rich-text-content";
 import { isRichTextEmpty } from "@/lib/sanitize-html";
 import { parseRxItems, stringifyRxItems } from "@/lib/rx";
 import { parseDiagnosisItems, stringifyDiagnosisItems } from "@/lib/diagnosis";
+import {
+  parseGlassPrediction,
+  stringifyGlassPrediction,
+  isGlassPredictionEmpty,
+  type GlassRow,
+} from "@/lib/glass-prediction";
+
+function actionIconSx(color: "primary" | "success" | "info") {
+  return (theme: Theme) => ({
+    p: 0.3,
+    border: "1px solid",
+    borderColor: theme.palette[color].main,
+    backgroundColor: alpha(theme.palette[color].main, 0.12),
+    transition: "background-color 0.15s ease",
+    "&:hover": {
+      backgroundColor: alpha(theme.palette[color].main, 0.26),
+    },
+  });
+}
 
 const EYE_ABBREVIATIONS: Record<string, string> = {
   Left: "LE",
@@ -52,7 +79,6 @@ type SectionKey =
   | "historyDetail"
   | "investigation"
   | "plan"
-  | "glassPrediction"
   | "advice"
   | "followUp";
 
@@ -130,12 +156,62 @@ export default function PrescriptionWorkspace({
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [rxEditorOpen, setRxEditorOpen] = useState(false);
   const [diagnosisEditorOpen, setDiagnosisEditorOpen] = useState(false);
+  const [glassPredictionEditorOpen, setGlassPredictionEditorOpen] =
+    useState(false);
+  const vitalsBarRef = useRef<HTMLDivElement>(null);
+  const [vitalsBarScale, setVitalsBarScale] = useState(1);
 
   const rxItems = useMemo(() => parseRxItems(patient?.rx ?? ""), [patient?.rx]);
   const diagnosisItems = useMemo(
     () => parseDiagnosisItems(patient?.diagnosis ?? ""),
     [patient?.diagnosis],
   );
+  const glassPrediction = useMemo(
+    () => parseGlassPrediction(patient?.glassPrediction ?? ""),
+    [patient?.glassPrediction],
+  );
+
+  useEffect(() => {
+    const el = vitalsBarRef.current;
+    if (!el) {
+      return;
+    }
+
+    function measure() {
+      if (!el) {
+        return;
+      }
+      const available = el.parentElement?.clientWidth ?? el.clientWidth;
+      if (!available) {
+        return;
+      }
+      // Measure the row's natural (unscaled) width so we can compute how
+      // much it needs to shrink to avoid causing horizontal overflow.
+      const previousTransform = el.style.transform;
+      el.style.transform = "none";
+      const natural = el.scrollWidth;
+      el.style.transform = previousTransform;
+
+      const nextScale =
+        natural > available ? Math.max(available / natural, 0.6) : 1;
+      setVitalsBarScale((current) =>
+        Math.abs(current - nextScale) > 0.01 ? nextScale : current,
+      );
+    }
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    if (el.parentElement) {
+      observer.observe(el.parentElement);
+    }
+    return () => observer.disconnect();
+  }, [
+    patient?.ucvaRight,
+    patient?.ucvaLeft,
+    patient?.iopRight,
+    patient?.iopLeft,
+    patient?.historyTag,
+  ]);
 
   const tabMapping = tab ? TAB_TO_SECTION[tab] : undefined;
   const activeEditor: EditorState | null =
@@ -240,16 +316,69 @@ export default function PrescriptionWorkspace({
                 width={40}
                 height={40}
               />
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 24 }}>
                 {hospital.hospitalName}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.secondary">
-              {hospital.address} | {hospital.contact} | {hospital.website}
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ fontSize: 13 }}
+            >
+              {hospital.address} | {hospital.contact} |{" "}
+              <Box
+                component="a"
+                href={hospital.website}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: "primary.main" }}
+              >
+                {hospital.website}
+              </Box>
             </Typography>
-            <Typography variant="h6" sx={{ mt: 0.25, fontWeight: 700 }}>
-              Prescription Sheet
-            </Typography>
+            <Box
+              sx={{
+                position: "relative",
+                alignSelf: "stretch",
+                display: "flex",
+                justifyContent: "center",
+                mt: 0.25,
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 24 }}>
+                Prescription Sheet
+              </Typography>
+              <Box
+                aria-hidden
+                sx={{
+                  position: "absolute",
+                  right: 3,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 0.25,
+                  "@media print": { display: "flex" },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 100,
+                    height: 26,
+                    backgroundImage:
+                      "repeating-linear-gradient(90deg, #111 0px, #111 2px, transparent 2px, transparent 4px, #111 4px, #111 5px, transparent 5px, transparent 9px, #111 9px, #111 12px, transparent 12px, transparent 14px, #111 14px, #111 15px, transparent 15px, transparent 18px)",
+                  }}
+                />
+                <Typography
+                  variant="caption"
+                  color="text.secondary"
+                  sx={{ fontSize: 8, letterSpacing: 1 }}
+                >
+                  0000 506025
+                </Typography>
+              </Box>
+            </Box>
           </Box>
 
           <Box
@@ -262,32 +391,207 @@ export default function PrescriptionWorkspace({
               },
             }}
           >
-            <Typography variant="body2" sx={{ fontWeight: 700 }}>
+            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 14 }}>
               Name: {patient?.patientName ?? "-"}
             </Typography>
-            <Typography
-              variant="body2"
+            <Box
               sx={{
-                fontWeight: 700,
-                textAlign: { xs: "left", md: "right" },
-                "@media print": { textAlign: "right" },
+                display: "flex",
+                justifyContent: { xs: "flex-start", md: "flex-end" },
+                "@media print": { justifyContent: "flex-end" },
+                gap: 2,
               }}
             >
-              ID: {patient?.patientCode ?? "-"}
-            </Typography>
-            <Typography variant="body2" sx={{ fontWeight: 700 }}>
-              Details: {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 700, fontSize: 14 }}
+              >
+                UIN: {patient?.patientCode ?? "-"}
+              </Typography>
+              <Typography variant="body2" sx={{ fontSize: 14 }}>
+                <Box component="span" sx={{ fontWeight: 700 }}>
+                  MRN:
+                </Box>{" "}
+                {patient?.mrn ?? "-"}
+              </Typography>
+            </Box>
+            <Typography variant="body2" sx={{ fontWeight: 700, fontSize: 14 }}>
+              {patient?.sex ?? "-"}, Age {patient?.age ?? "-"}
             </Typography>
             <Typography
               variant="body2"
               sx={{
                 fontWeight: 700,
+                fontSize: 14,
                 textAlign: { xs: "left", md: "right" },
                 "@media print": { textAlign: "right" },
               }}
             >
               Date: {today}
             </Typography>
+          </Box>
+
+          <Box
+            ref={vitalsBarRef}
+            sx={{
+              mx: { xs: -2, sm: -3, md: -4 },
+              mt: { xs: -1.25, md: -1.75 },
+              mb: 0.5,
+              px: { xs: 2, sm: 3, md: 4 },
+              py: 0.5,
+              backgroundColor: "#ffe699",
+              display: "grid",
+              gridTemplateColumns: "1fr auto 1fr",
+              alignItems: "center",
+              gap: 1,
+              transform: `scale(${vitalsBarScale})`,
+              transformOrigin: "center",
+              "@media print": { display: "grid", transform: "none" },
+            }}
+          >
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-start",
+                gap: 0.75,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                UCVA:
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  border: "1.5px solid rgba(4, 102, 156, 0.45)",
+                  overflow: "hidden",
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(4, 102, 156, 0.14)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 13.5,
+                      color: "primary.dark",
+                    }}
+                  >
+                    {patient?.ucvaRight || "-"}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(4, 102, 156, 0.14)",
+                    borderLeft: "1.5px solid rgba(4, 102, 156, 0.45)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: 13.5,
+                      color: "primary.dark",
+                    }}
+                  >
+                    {patient?.ucvaLeft || "-"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 0.75,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                IOP:
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  border: "1.5px solid rgba(0, 0, 0, 0.2)",
+                  overflow: "hidden",
+                }}
+              >
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 13.5 }}
+                  >
+                    {patient?.iopRight || "-"}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    px: 0.75,
+                    py: 0.1,
+                    backgroundColor: "rgba(255, 255, 255, 0.7)",
+                    borderLeft: "1.5px solid rgba(0, 0, 0, 0.2)",
+                  }}
+                >
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 13.5 }}
+                  >
+                    {patient?.iopLeft || "-"}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 0.5,
+              }}
+            >
+              <Typography
+                variant="caption"
+                sx={{ fontWeight: 700, fontSize: 13.5 }}
+              >
+                History:
+              </Typography>
+              <Box
+                sx={{
+                  px: 0.75,
+                  py: 0.1,
+                  borderRadius: 0,
+                  backgroundColor: "rgba(255, 255, 255, 0.7)",
+                  border: "1.5px solid rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <Typography
+                  variant="caption"
+                  sx={{ fontWeight: 700, fontSize: 13.5 }}
+                >
+                  {patient?.historyTag || "-"}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
 
           <Divider />
@@ -328,7 +632,11 @@ export default function PrescriptionWorkspace({
                       >
                         <Typography
                           variant="caption"
-                          sx={{ fontWeight: 700, whiteSpace: "nowrap" }}
+                          sx={{
+                            fontWeight: 700,
+                            fontSize: 14,
+                            whiteSpace: "nowrap",
+                          }}
                         >
                           {section.title}
                           {isHistory ? ":" : ""}
@@ -338,7 +646,7 @@ export default function PrescriptionWorkspace({
                             html={summary}
                             sx={{
                               display: "inline",
-                              fontSize: 11,
+                              fontSize: 13,
                               color: "text.secondary",
                               "& ul": {
                                 display: "inline",
@@ -358,7 +666,9 @@ export default function PrescriptionWorkspace({
                           <IconButton
                             size="small"
                             color={hasSummary ? "primary" : "success"}
-                            sx={{ p: 0.25 }}
+                            sx={actionIconSx(
+                              hasSummary ? "primary" : "success",
+                            )}
                             onClick={() =>
                               setEditor({
                                 key: section.summaryKey as SectionKey,
@@ -368,9 +678,9 @@ export default function PrescriptionWorkspace({
                             }
                           >
                             {hasSummary ? (
-                              <EditIcon sx={{ fontSize: 14 }} />
+                              <EditIcon sx={{ fontSize: 16 }} />
                             ) : (
-                              <AddIcon sx={{ fontSize: 14 }} />
+                              <AddIcon sx={{ fontSize: 16 }} />
                             )}
                           </IconButton>
                         </Tooltip>
@@ -378,7 +688,7 @@ export default function PrescriptionWorkspace({
                           <IconButton
                             size="small"
                             color="info"
-                            sx={{ p: 0.25 }}
+                            sx={actionIconSx("info")}
                             onClick={() =>
                               setEditor({
                                 key: section.detailKey as SectionKey,
@@ -387,7 +697,7 @@ export default function PrescriptionWorkspace({
                               })
                             }
                           >
-                            <VisibilityIcon sx={{ fontSize: 14 }} />
+                            <VisibilityIcon sx={{ fontSize: 16 }} />
                           </IconButton>
                         </Tooltip>
                       </Box>
@@ -397,7 +707,7 @@ export default function PrescriptionWorkspace({
                         html={summary}
                         sx={{
                           mt: 0.25,
-                          fontSize: 11,
+                          fontSize: 13,
                           color: "text.secondary",
                         }}
                       />
@@ -414,19 +724,24 @@ export default function PrescriptionWorkspace({
                     gap: 0.5,
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 14 }}
+                  >
                     Diagnosis:{" "}
                   </Typography>
                   <IconButton
                     size="small"
                     color={diagnosisItems.length > 0 ? "primary" : "success"}
-                    sx={{ p: 0.25 }}
+                    sx={actionIconSx(
+                      diagnosisItems.length > 0 ? "primary" : "success",
+                    )}
                     onClick={() => setDiagnosisEditorOpen(true)}
                   >
                     {diagnosisItems.length > 0 ? (
-                      <EditIcon sx={{ fontSize: 14 }} />
+                      <EditIcon sx={{ fontSize: 16 }} />
                     ) : (
-                      <AddIcon sx={{ fontSize: 14 }} />
+                      <AddIcon sx={{ fontSize: 16 }} />
                     )}
                   </IconButton>
                 </Box>
@@ -447,7 +762,7 @@ export default function PrescriptionWorkspace({
                         <Typography
                           variant="caption"
                           color="text.secondary"
-                          sx={{ fontSize: 11 }}
+                          sx={{ fontSize: 13 }}
                         >
                           {item.name}
                           {item.eye
@@ -477,13 +792,16 @@ export default function PrescriptionWorkspace({
                         gap: 0.5,
                       }}
                     >
-                      <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                      <Typography
+                        variant="caption"
+                        sx={{ fontWeight: 700, fontSize: 14 }}
+                      >
                         {label}
                       </Typography>
                       <IconButton
                         size="small"
                         color={hasContent ? "primary" : "success"}
-                        sx={{ p: 0.25 }}
+                        sx={actionIconSx(hasContent ? "primary" : "success")}
                         onClick={() =>
                           setEditor({
                             key: key as SectionKey,
@@ -493,9 +811,9 @@ export default function PrescriptionWorkspace({
                         }
                       >
                         {hasContent ? (
-                          <EditIcon sx={{ fontSize: 14 }} />
+                          <EditIcon sx={{ fontSize: 16 }} />
                         ) : (
-                          <AddIcon sx={{ fontSize: 14 }} />
+                          <AddIcon sx={{ fontSize: 16 }} />
                         )}
                       </IconButton>
                     </Box>
@@ -504,7 +822,7 @@ export default function PrescriptionWorkspace({
                         html={content}
                         sx={{
                           mt: 0.25,
-                          fontSize: 11,
+                          fontSize: 13,
                           color: "text.secondary",
                         }}
                       />
@@ -537,19 +855,24 @@ export default function PrescriptionWorkspace({
                     gap: 0.5,
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 14 }}
+                  >
                     Rx.
                   </Typography>
                   <IconButton
                     size="small"
                     color={rxItems.length > 0 ? "primary" : "success"}
-                    sx={{ p: 0.25 }}
+                    sx={actionIconSx(
+                      rxItems.length > 0 ? "primary" : "success",
+                    )}
                     onClick={() => setRxEditorOpen(true)}
                   >
                     {rxItems.length > 0 ? (
-                      <EditIcon sx={{ fontSize: 14 }} />
+                      <EditIcon sx={{ fontSize: 16 }} />
                     ) : (
-                      <AddIcon sx={{ fontSize: 14 }} />
+                      <AddIcon sx={{ fontSize: 16 }} />
                     )}
                   </IconButton>
                 </Box>
@@ -579,7 +902,7 @@ export default function PrescriptionWorkspace({
                             variant="caption"
                             sx={{
                               fontWeight: 700,
-                              fontSize: 11,
+                              fontSize: 14,
                               display: "block",
                             }}
                           >
@@ -589,7 +912,7 @@ export default function PrescriptionWorkspace({
                             <Typography
                               variant="caption"
                               color="text.secondary"
-                              sx={{ fontSize: 11, display: "block" }}
+                              sx={{ fontSize: 13, display: "block" }}
                             >
                               {usageParts.join(" --------------- ")}
                             </Typography>
@@ -602,7 +925,7 @@ export default function PrescriptionWorkspace({
                   <Typography
                     variant="caption"
                     color="text.secondary"
-                    sx={{ mt: 0.5, display: "block" }}
+                    sx={{ mt: 0.5, display: "block", fontSize: 13 }}
                   >
                     No medicine selected yet.
                   </Typography>
@@ -618,10 +941,104 @@ export default function PrescriptionWorkspace({
                   gap: 0.75,
                 }}
               >
+                <Box sx={{ p: 0.75 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 0.5,
+                    }}
+                  >
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: 700, fontSize: 14 }}
+                    >
+                      Glass Prediction:
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      color={
+                        isGlassPredictionEmpty(glassPrediction)
+                          ? "success"
+                          : "primary"
+                      }
+                      sx={actionIconSx(
+                        isGlassPredictionEmpty(glassPrediction)
+                          ? "success"
+                          : "primary",
+                      )}
+                      onClick={() => setGlassPredictionEditorOpen(true)}
+                    >
+                      {isGlassPredictionEmpty(glassPrediction) ? (
+                        <AddIcon sx={{ fontSize: 16 }} />
+                      ) : (
+                        <EditIcon sx={{ fontSize: 16 }} />
+                      )}
+                    </IconButton>
+                  </Box>
+                  <Table
+                    size="small"
+                    sx={{
+                      mt: 0.5,
+                      "& td, & th": {
+                        border: "1px solid",
+                        borderColor: "divider",
+                        p: 0.25,
+                        fontSize: 12,
+                        textAlign: "center",
+                      },
+                      "& th": { fontWeight: 700 },
+                    }}
+                  >
+                    <TableHead>
+                      <TableRow>
+                        <TableCell colSpan={2} />
+                        <TableCell component="th">SPH</TableCell>
+                        <TableCell component="th">CYL</TableCell>
+                        <TableCell component="th">AXIS</TableCell>
+                        <TableCell component="th">V/A</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell rowSpan={2} sx={{ fontWeight: 700 }}>
+                          DIST
+                        </TableCell>
+                        <TableCell>R</TableCell>
+                        {(
+                          ["sph", "cyl", "axis", "va"] as Array<keyof GlassRow>
+                        ).map((field) => (
+                          <TableCell key={field}>
+                            {glassPrediction.dist.right[field] || "-"}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow>
+                        <TableCell>L</TableCell>
+                        {(
+                          ["sph", "cyl", "axis", "va"] as Array<keyof GlassRow>
+                        ).map((field) => (
+                          <TableCell key={field}>
+                            {glassPrediction.dist.left[field] || "-"}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                  {glassPrediction.notes ? (
+                    <Typography
+                      variant="caption"
+                      color="text.secondary"
+                      sx={{ mt: 0.5, display: "block", fontSize: 13 }}
+                    >
+                      {glassPrediction.notes}
+                    </Typography>
+                  ) : null}
+                </Box>
+
                 {[
-                  ["Glass Prediction", "glassPrediction"],
-                  ["Advice", "advice"],
-                  ["Follow Up", "followUp"],
+                  ["Advice:", "advice"],
+                  ["Follow Up:", "followUp"],
                 ].map(([label, key]) => {
                   const content = String(
                     patient?.[key as keyof PatientRecord] ?? "",
@@ -636,13 +1053,16 @@ export default function PrescriptionWorkspace({
                           gap: 0.5,
                         }}
                       >
-                        <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ fontWeight: 700, fontSize: 14 }}
+                        >
                           {label}
                         </Typography>
                         <IconButton
                           size="small"
                           color={hasContent ? "primary" : "success"}
-                          sx={{ p: 0.25 }}
+                          sx={actionIconSx(hasContent ? "primary" : "success")}
                           onClick={() =>
                             setEditor({
                               key: key as SectionKey,
@@ -652,9 +1072,9 @@ export default function PrescriptionWorkspace({
                           }
                         >
                           {hasContent ? (
-                            <EditIcon sx={{ fontSize: 14 }} />
+                            <EditIcon sx={{ fontSize: 16 }} />
                           ) : (
-                            <AddIcon sx={{ fontSize: 14 }} />
+                            <AddIcon sx={{ fontSize: 16 }} />
                           )}
                         </IconButton>
                       </Box>
@@ -663,7 +1083,7 @@ export default function PrescriptionWorkspace({
                           html={content}
                           sx={{
                             mt: 0.25,
-                            fontSize: 11,
+                            fontSize: 13,
                             color: "text.secondary",
                           }}
                         />
@@ -683,16 +1103,28 @@ export default function PrescriptionWorkspace({
                     alignItems: "center",
                     textAlign: "center",
                     gap: 0.1,
+                    transform: "translateX(-8%)",
                   }}
                 >
-                  <Typography variant="caption" sx={{ fontWeight: 700 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ fontWeight: 700, fontSize: 12 }}
+                  >
                     {session.doctorName}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontSize: 11 }}
+                  >
                     {session.designation} | Reg: {session.registrationNumber} |{" "}
                     {session.specialization}
                   </Typography>
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography
+                    variant="caption"
+                    color="text.secondary"
+                    sx={{ fontSize: 11 }}
+                  >
                     {today} at {now}
                   </Typography>
                 </Box>
@@ -739,6 +1171,17 @@ export default function PrescriptionWorkspace({
         onSave={async (nextItems) => {
           await saveField("diagnosis", stringifyDiagnosisItems(nextItems));
           closeDiagnosisEditor();
+        }}
+      />
+
+      <GlassPredictionDialog
+        key={`gp-${patient?.patientCode ?? "none"}-${patient?.glassPrediction ?? ""}`}
+        open={glassPredictionEditorOpen}
+        initialValue={glassPrediction}
+        onCancel={() => setGlassPredictionEditorOpen(false)}
+        onSave={async (next) => {
+          await saveField("glassPrediction", stringifyGlassPrediction(next));
+          setGlassPredictionEditorOpen(false);
         }}
       />
     </Stack>

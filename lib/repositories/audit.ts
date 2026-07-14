@@ -43,22 +43,30 @@ export async function appendAuditEntry(entry: AuditEntry): Promise<void> {
     "Value Snippet": truncate(entry.valueSnippet),
   };
 
-  const exists = await fileExists(DATA_FILES.auditLog);
+  // Best-effort only: the audit trail is a nice-to-have, not something that
+  // should ever block or fail a save. On read-only deployments (e.g. Vercel
+  // serverless) writing to the CSV file will throw, so swallow errors here
+  // instead of letting them bubble up and crash the save request.
+  try {
+    const exists = await fileExists(DATA_FILES.auditLog);
 
-  if (!exists) {
+    if (!exists) {
+      const output = stringify([row], {
+        header: true,
+        columns: AUDIT_HEADERS as unknown as string[],
+      });
+      await fs.writeFile(DATA_FILES.auditLog, output, "utf-8");
+      return;
+    }
+
     const output = stringify([row], {
-      header: true,
+      header: false,
       columns: AUDIT_HEADERS as unknown as string[],
     });
-    await fs.writeFile(DATA_FILES.auditLog, output, "utf-8");
-    return;
+    await fs.appendFile(DATA_FILES.auditLog, output, "utf-8");
+  } catch (error) {
+    console.warn("Unable to write audit log entry; skipping.", error);
   }
-
-  const output = stringify([row], {
-    header: false,
-    columns: AUDIT_HEADERS as unknown as string[],
-  });
-  await fs.appendFile(DATA_FILES.auditLog, output, "utf-8");
 }
 
 export async function getAuditEntries(): Promise<AuditEntry[]> {

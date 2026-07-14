@@ -21,3 +21,5 @@ Timestamp,Doctor Username,Patient Code,Field,Value Snippet
 2026-07-13T15:32:17.227Z,sarwar,P-1001,rx,"[{""id"":""rx-1783956164945-1"",""medicine"":""Timoptic (Eye Drop) - Glaucoma"",""dosage"":""1 drop"",""eye"":""Both"",""frequency"":""2 ti..."
 2026-07-13T16:33:10.669Z,sarwar,P-1001,diagnosis,"[{""id"":""dx-legacy-0"",""name"":""Dry Eye Syndrome"",""eye"":""""},{""id"":""dx-1783960218127-1"",""name"":""Corneal Ulcer"",""eye"":""Left""}..."
 2026-07-13T16:35:14.872Z,sarwar,P-1001,diagnosis,"[{""id"":""dx-legacy-0"",""name"":""Dry Eye Syndrome"",""eye"":""Right""},{""id"":""dx-1783960218127-1"",""name"":""Corneal Ulcer"",""eye"":""L..."
+2026-07-14T15:15:01.419Z,sarwar,P-1001,glassPrediction,"{""dist"":{""right"":{""sph"":""-2.0"",""cyl"":""-0.25"",""axis"":""180"",""va"":""6/6""},""left"":{""sph"":""2.0"",""cyl"":""0.5"",""axis"":""180"",""va"":..."
+2026-07-14T15:16:10.719Z,sarwar,P-1001,glassPrediction,"{""dist"":{""right"":{""sph"":""-2.0"",""cyl"":""-0.25"",""axis"":""180"",""va"":""6/6""},""left"":{""sph"":""2.0"",""cyl"":""0.5"",""axis"":""180"",""va"":..."
